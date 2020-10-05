@@ -1,0 +1,1271 @@
+
+STOICAL - STack Oriented Interactive Compiler Adapted to Linux.
+
+27 April 2002 Copyright (c) Jonathan Moore Liles.
+
+_____________________
+
+Table of Contents
+
+2. Introduction
+
+	2.1. The Dictionary
+	2.2. The Stack
+	2.3. The STOICAL Compiler
+	
+	2.3.1. Memory
+
+		2.3.1.1. Garbage Collection
+
+	2.3.2. Type Checking
+		
+
+3. Programming In STOICAL
+
+	3.1. Syntax
+
+	3.2. Colon Definitions
+	
+		3.2.1. Recursion
+		3.2.2. Type Checking
+	
+	3.3. Control Structures
+
+		3.3.1. Clauses
+		3.3.2. Conditionals
+		3.3.3. Iteration
+
+			3.3.3.1. Parenthesis Loops
+			3.3.2.2. { ... }UNTIL and { ... }WHILE{ ... } Loops
+			3.3.3.3. BEGIN ... END Loops
+			3.3.2.4. LOOP{ ... } Loops
+			3.3.3.5. DO Loops
+			
+		3.3.4. Nesting And Line Continuation
+
+	3.4. Regular Expressions
+
+		3.4.1. Quoting
+		3.4.2. Matching
+		3.4.3. Substitution
+		3.4.4. The EXpression Modifier
+
+	3.5. Comments
+
+	3.6. Data. Definition, Instantiation, And Usage.
+
+		3.6.1. Constants
+		3.6.2. Variables
+		3.6.3. Arrays
+
+			3.6.3.1. Syntax
+			3.6.3.2. Definition and Initialization
+			3.6.3.3. Access
+
+		3.6.4. Associative Arrays (Hahses)
+
+			3.6.4.1. Hash Tables Overview
+			3.6.4.2. Syntax
+			3.6.4.3. Definition and Initialization
+			3.6.4.4. Access
+
+				3.6.4.4.1. Key iteration
+
+	3.7. Using The Dictionary
+
+		3.7.1. Scope
+
+			3.7.1.1. Definitions
+			
+		3.7.2. Vocabularies and Branches
+
+	3.8. Input/Output
+
+		3.8.1. I/O Abstraction
+		3.8.2. Terminal
+		3.8.3. Files
+		
+			3.8.3.1. Directories
+
+		3.8.4. Sockets
+
+			3.8.4.1. Incoming
+			3.8.4.2. Outgoing
+
+	3.9. Environment
+
+	3.10. Threads
+	
+		3.10.1. Creation
+		3.10.2. Data
+
+			3.10.2.1. Consistency
+
+		3.10.3. Destruction
+
+
+10. Portability
+
+	10.1. Compiler
+	10.2. Source
+
+11. Glossary
+
+	11.1. Symbols.
+	11.2. Terms.
+
+2. Introduction
+
+2.1. The Dictionary
+
+The core data structures of STOICAL, called vocabularies, are doubly linked
+lists of entries called words. Each word contains a name field, type field,
+code pointer field, and pointers to the words behind and ahead of it in the
+list. Word entries also contain a variable sized stack for garbage collection,
+called the collectables stack. Entries on this stack contain pointers to
+memory to be dealt with, as well as pointers to handler routines needed to
+free said memory. Finally, word entries contain another variable length
+field, called the parameter field (or parm). This field is used to store the
+content or meaning of the word. For colon definitions (subroutines) it contains
+the instructions to executed. While, for variables, it contains the variable
+data.
+
+The dictionary is the collective contents of all the vocabularies listed on the
+vocabulary stack (vstack) at any one time. When performing a dictionary lookup,
+each vocabulary on the vstack is searched, beginning with the topmost, and
+ending when the first match is found. When a word is redefined, instead of
+removing the old version, STOICAL simply appends the new entry onto the end of
+the current vocabulary. Therefore, when new definitions refer to this word,
+they are referring to the most recent instance of it in the first vocabulary
+in which it could be located. Words that were defined before this change will
+continue to access the old version of the word. 
+
+Words are the basic units, or atoms, of STOICAL. All of the operators built
+into the language are, in fact, just words defined in the STOICAL< vocabulary.
+Some are defined with compiler generated machine code, while others have
+high-level definitions. This design allows the programmer the freedom to
+completely redefine the language at runtime.
+
+2.2. The Stack
+
+In STOICAL words interact with each other by passing values across the
+parameter stack. A stack is a LIFO, or last in first out, buffer in memory.
+Words receive their arguments by popping values off the stack and return
+results by pushing values back onto it. Similar stacks exist in infix computer
+languages (such as C), though they are hidden from the user; A situation that
+is far from optimal.
+
+Due to STOICAL's use of a stack for communication, the choice of Reverse Polish
+Notation syntax is obvious. Most people will recognize Reverse Polish, or
+postfix, from a series of calculators manufactured by Hewlett Packard.  In
+postfix notation both operands precede their operator. The operator simply
+pops each operand from the stack and then pushes back the result of its
+calculation. Because of this method, postfix notation eliminates the need for
+unsightly parenthesis.
+
+notation		expression			Expressive Notations
+---------------
+Postfix			a b + c * d +
+Infix			(a + b) * c + d
+
+
+2.3. The STOICAL Compiler
+
+This section describes the very specific inner workings of the compiler. As
+STOICAL is still a very new language, I have not now, and may never complete
+this section. Those interested in such matters are urged to read the compiler
+source code.
+
+3. Programming in STOICAL
+
+3.1. Syntax
+
+STOICAL has been blessed with a syntax that is simple, graceful, and most
+importantly, comprehensible. You'll certainly never find yourself wondering
+about operator precedence or throwing in parenthesis 'just in case'. 
+
+In STOICAL a line of source is made up of literals or names of words delimited
+by spaces or tabs, and terminated with a newline.  The compiler's outer loop
+consists of instructions to read in the next line of input, compile it into
+pseudo instructions, stack those instructions  onto a temporary stack called
+the compile stack or cstack, and finally execute the compiled code. This method
+is known as Incremental Compilation. In the case of commands that must span
+multiple lines a nesting depth is employed to delay execution until the entire
+command has been entered. An example of this situation would be colon
+definitions or looping constructs.
+
+3.2. Colon definitions
+
+Colon definitions are used to compile new words into the dictionary. The effect
+of this is similar to that of function or procedure definitions in other
+languages. New words are defined in terms of other, already defined words,
+and string and number literals. Below is an example of a colon definition's 
+format:
+
+	'name : word1 word2 ... wordN ;
+
+In this example 'name is a string literal representing a name for the new word.
+This name is taken as an argument by the word : (colon). Colon creates an
+entry in the dictionary for the new word, and copies into it the compiled code
+up to ; (semicolon). Upon invocation of the new word, all of its component
+words will be executed in order just as if they had been typed in at the
+command line. Colon definitions raise the nesting level, and can therefore span
+across multiple lines. 
+
+Words are only compiled once during the process of their definition. This is
+in contrast to interpretive languages, where source lines must be recompiled
+every time they are executed. All of this combines to make an environment in
+which the overhead for subroutine invocation so low it need not concern the
+programmer.
+
+3.2.1. Recursion
+
+Words can invoke themselves in a tail-recursive fashion by calling the word
+REDO. Since tail-recursion is just a fancy way of defining a loop, all that
+REDO has to do is jump back to the first instruction of the colon definition
+from which it was called. eg.,
+
+	'foo : 1 = redo ;
+	
+Alternatively, RECURSE word can be used to build real recursive calls. However,
+one must bear in mind that a routine can only enter as many levels of recursion
+as the return stack is deep. This may change in the future. Below is an example
+of this type of recursion.
+
+	'factorial : dup 1 ne if dup 1- recurse * then ;
+
+3.2.2. Type-checking
+
+STOICAL provides facilities for Dynamic Passive Type-checking. The system is
+passive because only words explicitly defined as requiring type-checking will
+incur any reduction in performance, and it is dynamic because all type-checking
+occurs at runtime.
+
+The :( ): words and the TYPES< vocabulary are used together to specify which
+types, and in which order, a word should accept. For instance, the example word
+defined below accepts a STRING at Next To Top of stack, and a FLOAT at Top.
+
+	'foo :( s f ): ... ;
+
+The TYPES< vocabulary contains constants that map type names to their numeric
+values. The the word :( pushes this vocabulary onto the vocabulary stack to
+expose the names during definition. Both the abbreviated and verbose type
+names may be used here. Below is a list of the short and long names:
+
+short		long
+--------
+*		bah	( don't care )
+f		float
+s		string
+r		reference
+p		pointer
+io		stream 	( file / socket )
+a		array
+h		hash 
+c		clause
+
+
+If upon invocation the stack contents do not match any of a word's clauses,
+then word BADTYPE will be executed. The default behavior of BADTYPE is to print
+an appropriate error message and call ABORT.  Definitions may be overloaded by
+defining them again with distinct types, of the same depth. ie.,
+
+	'foo :( s f ): ... ;
+	'foo :( f s ): ... ;
+
+Defines the word FOO to take two different courses of action, based on the
+contents of the stack at runtime. (You may have already noticed that several of
+STOICAL's core words are overloaded in this fashion.)
+
+The * type is used in cases where it is preferable to ignore the type of one or
+more cells and still check the others. The example below ignores both TOS and
+TOS-1, allowing execution to pivot only on TOS-2.
+
+	'bar :( s * * ): ... ;
+
+The type * effectively takes precedence over all other types, so it should only
+be used at the end of series. ie.,
+
+	'foo :( s f ): ... ;
+	'foo :( * f ): ... ;
+
+The current depth limit on type-checking is four cells. In practice this is
+more than enough; Words that accept more than four distinctly typed cells
+should be re-factored. (If you were to ask Chuck Moore, he'd say that this is
+extravagant.)
+
+3.3. Control Structures
+
+3.3.1. Clauses
+
+Clauses are the underlying structure from which all conditional and iterative
+constructs are built. Even colon definitions are implemented through clauses.
+
+A clause can be thought of as a nameless word that executes in the caller's
+scope. The default behavior of a clause, like a word, is simply to execute
+itself. The conditional operators can change this behavior at compile time,
+arranging for a clause to be executed conditionally, or even many times in
+iteration.
+
+The { and } words are used to define clauses. In the example below we define
+a clause that, when executed, prints the text "foo" onto the terminal.
+
+	{ 'foo = }
+
+The open-brace ({) set of words all operate on clauses. For example we might
+use the word {if to conditionally execute our clause:
+
+	true {if { 'foo = }
+
+Of course, the reason {IF isn't just named IF, is that we must define IF to
+behave just as it did in the original STOIC. To ameliorate this awkwardness, as
+well as finger work, STOICAL defines the word IF{ as "{IF {".
+Therefore,
+
+	true if{ 'foo = }
+
+Is equivalent to the former example.
+
+In fact, IF is simply an alias for IF{. Similarly, THEN is an alias for }.
+This allows the original STOIC conditional syntax to be used. ie.,
+
+	true if 'foo = then
+	
+
+The use of clauses greatly simplifies the work of the compiler as compared to
+the original STOIC implementation. It is not necessary however that you use the
+new syntax in order to reap its rewards.
+
+3.3.2. Conditionals
+
+STOCIAL currently supports both clause style and IF ... ELSE ... THEN style
+conditionals, as well as a plethora of operators for comparing and manipulating
+the values passed to these constructs. Conditionals may be nested, providing
+that a conditional beginning within other clauses also end in the same clause.
+The four forms of 'IF' constructs follow:
+
+	(expression) IF{ true clause }
+Or
+	(expression) IF true clause THEN
+
+In the above example, the true clause will be executed only if the expression
+is not equal to the value of FALSE. THEN can be thought of as 'endif' in other
+languages. Note that IF, just like most other words, pops the topmost value
+from the stack. If the value of the expression needs to be used again later
+it should be DUPlicated before making the comparison.
+
+	(expression) IF{ true clause }else{ false clause }
+	
+	(expression) IF true clause ELSE false clause THEN
+
+Here, if the expression is FALSE, STOICAL will execute the false clause instead
+of performing no operation. Otherwise, the true clause will be executed.
+
+3.3.3. Iteration
+
+3.3.3.1 Parenthesis Loops
+
+The parenthesis loop is used to iterate over a clause a given number of times:
+
+	{expression} ( {iteration clause} )
+
+The expression will be taken as a repeat count for the loop. A zero or negative
+expression will cause the loop to be skipped over entirely.
+
+3.3.2.2. { ... }UNTIL and { ... }WHILE{ ... } Loops
+
+The { ... }UNTIL construct is used in situations where a clause must be
+executed until some condition is met:
+
+	{ clause }until
+
+In the above example the clause is executed, and the resultant expression is
+compared to the value of FALSE. If they are equal, then the the process repeats
+itself ad infinitum. Otherwise, the loop is terminated and execution continues
+at the word following }UNTIL.
+
+Similarly, the expression may be evaluated at the beginning of the iteration
+through the used of the { ... }WHILE{ ... } construction.
+
+	{ expression }WHILE{ clause }
+
+Here, the expression is evaluated, and the loop is terminated if it is equal to
+FALSE. Otherwise, the process repeats itself. 
+
+3.3.3.3 BEGIN ... END Loops
+
+The BEGIN ... END constructs behavior is identical to the { ... }UNTIL
+construct.  For example the following are equivalent:
+
+	begin ... expression end
+	
+	{ ... expression }until
+
+3.3.2.4. LOOP{ ... } Loops.
+
+LOOP{ loops can be used in situations where a clause must be executed repeatedly
+while running an index from an lower limit to an upper limit. The LOOP{ loop can
+appear in one of the two following forms:
+
+	(upper limit) (lower limit) LOOP{ clause }
+
+	(upper limit) (lower limit) +LOOP{ clause ... increment }
+
+LOOP{ loops use the loop stack, or lstack, to hold their limits and current
+index.  Therefore, it is important that if the clause is to modify the loop
+stack, that it also restore it to the state it was in upon entry. Within all
+indexed looping constructs the word I, a mnemonic for Index, will push a copy
+of the current index onto the parameter stack. ie.,
+
+	10 0 loop{ i = }
+
+Will produce the output:
+
+	0 1 2 3 4 5 6 8 9
+
+Along with I, STOICAL provides the traditional J and K for indices of the
+encompassing loops. The reverse of the index may be obtained by prefixing the
+index word with a minus sign. ie.,
+
+	10 0 loop{ -i = }
+
+Produces:
+
+	9 8 7 6 5 4 3 2 1 0
+
+Additionally, you may cause any index loop to unconditionally terminate upon
+its next iteration by invoking the word BREAK. ie.,
+
+	10 0 loop{ i = break }
+
+Produces:
+
+	0
+	
++LOOP{ is similar to LOOP{, except that, instead of incrementing the index by
+one on each iteration, it increments it by the value of increment (TOS).
+
+3.3.3.5 DO Loops
+
+DO Loops are provided for compatibility with the original STOIC. A DO loop can
+take one of the two following forms.
+
+	(upper limit) (lower limit) DO clause LOOP
+	(upper limit) (lower limit) DO clause ... increment +LOOP
+
+
+3.3.4 Nesting Depth And Line Continuation
+
+During compilation STOICAL tracks the nesting depth of the expression being
+evaluated. The words +CHECK and -CHECK are used to raise and lower the depth,
+respectively. A syntax error is generated if the nesting depth ever becomes
+negative. The current nesting depth is reported by the input prompt when source
+is being read from the terminal.
+
+After STOICAL has finished compiling a line of source code it checks the
+nesting depth; if it is zero, the line is executed. Otherwise, compilation
+continues with the next line. This allows colon definitions and other
+'containing' constructs to span across multiple lines of input.
+
+Execution may be delayed even if the nesting depth is zero by invoking the word
+"^". The practical use of "^" involves some idiosyncrasies of the compiler
+design. Specifically, because the compile stack is cleared and reused for each
+non-nested line input. This means that string literals pushed onto the stack
+from a line point to locations in the compile stack that are overwritten by the
+next line, causing future references to that string to return undefined
+results. To avoid this behavior, "^" is used to join the lines, causing them to
+share the compile stack. ie.,
+
+	"I'm a rather long string that might take up an entire line." ^
+	=
+	
+Produces:
+
+	I'm a rather long string that might take up an entire line.
+	
+Note that this issue only applies to literal strings at nesting depth zero.
+Literal strings within loops or definitions behave as is expected, as do
+dynamic strings, such as the result of a concatenation.
+
+3.4. Regular Expressions
+
+STOICAL includes support for the POSIX Regular Expression (regex) pattern
+matching facility; A truly striking feature for a stack based language.
+
+The following sections will attempt to describe the syntax and semantics of
+regex handling in STOICAL. However, they do not explain regular expressions
+themselves. For this information please read the regex(7) man page.
+
+3.4.1. Quoting
+
+The quoting semantics of regular expressions in STOICAL are nearly identical
+to that of strings. A regular expression is delimited by enclosing it inside
+of vertical bars (|). In order to use a vertical bar inside the expression
+you must escape it with a backslash character, ie., "\|". A Regular expression
+entered in this way will only be compiled once. In order do generate dynamic
+regex patterns you must enter the expression as a string and then invoke the
+MATCH word. This will be slower however because of the extra computation
+necessary to recompile the expression every time it is used.
+
+3.4.2. Matching
+
+A quoted regular expression can be thought of as a normal word; It takes as
+an argument the string value on top of the stack, and returns a series of
+strings representing the sub-patterns that matched, followed by a number
+indicating how many matches could be made. The maximum number of sub-matches
+returned can be affected by altering the value of the #MATCH variable.
+
+Here are a few examples of regex's in use:
+
+	"I'm placing a string on top of the stack" ^
+	|string\|hash|
+	stack
+	
+Produces:
+
+	"string" 1
+	
+If there is no match the only value left on the stack will be zero, also known
+as FALSE.
+
+3.4.3. Substitution
+
+The use of regular expressions for substitution is only slightly different from
+that of normal matching; Substitutions require an additional argument, a normal
+string representing the replacement. This replacement string may contain back
+references to the sub-patterns matched by the regular expression; Back
+references in the replacement string consist of the backslash (\) character
+followed by a single digit between 0 and 9. Zero represents the entire matching
+portion of the string, while 1 through 9 represent sub matches 1 through 9,
+respectively.
+
+A substitution is declared by supplying the X word with the S flag. Below is
+an example of substitution:
+
+	"may he live long, and may he love none." ^
+	's\0 x s |he|
+	stack
+
+Produces:
+
+	"may she live long, and may he love none." 1
+
+Notice that, only the first occurrence of "he" was matched, and therefore
+replaced. This behavior can be altered by supplying X with the G, or Global
+flag. ie,
+
+	"Wicked, shallow waters in my mind; Suffering and in my mind." ^
+	'her x sg |my|
+	stack
+
+Produces:
+
+	"Wicked, shallow waters in her mind; Suffering and in her mind." 2
+
+3.4.4. The EXpression Modifier
+
+As you have seen in the other examples, the word "x" is used to modify the
+behavior of an expression. It accepts a bare string of single character flags
+to its right hand side. These may be:
+
+(Note that "x" is a rather poor mnemonic for eXpression.) 
+
+flag	meaning						Expression Modifiers
+---------------
+b	use basic regex syntax instead of extended
+s	perform substitution
+i	ignore case
+g	match globally (match all occurrences)
+m	treat as multiple lines
+n	need not return the matches, just a boolean
+
+These may be specified in any order; Ambiguous conditions will yield to the
+the right most flag. 
+
+3.5. Comments
+
+When the word "%" is encountered during compilation it causes the remainder
+of the line it appears on to be ignored. Note that "%", is a word just like
+everything else, and must be surrounded by white space in order to be recognized
+as such. ie.,
+
+	1 2 + =		% valid comment.
+	%invalid comment.
+
+In order to support Unix shell magic, STOICAL defines the word "#!" as a
+synonym for "%". Therefore, the interpreter line in a STOICAL source file
+should look like:
+
+	#! /usr/local/bin/stoical
+
+3.6. Data. Definition, Instantiation, And Usage.
+
+3.6.1. Constants
+
+A constant is a special word that, upon invocation, pushes the value with which
+it was defined onto the parameter stack. Constants are defined as follows:
+
+	{expression} 'name constant
+
+Here expression is taken to be the value for the constant, and 'name as its
+title.
+
+3.6.2. Variables
+
+Variables are words that push their own address onto the parameter stack. This
+address is then used by the @ (load) and ! (store) operators manipulate or
+retrieve its value. The definition of a variable is similar to that of a
+constant:
+
+	{expression} 'name variable
+	
+If multi-threading is enabled, and the variable is to be accessed concurrently
+by multiple threads, then it should be declared serial with the SHARED word.
+SHARED affects the most recently defined word, and works on all types of
+dictionary entries, even colon definitions; Though, using it for such a purpose
+would be misguided at best.
+
+3.6.3. Arrays
+
+STOICAL provides a novel approach to indexing arrays (in a stack based
+language).  This implementation is clean, obvious, and well integrated with the
+rest of the system. In addition to index addressing, arrays may be manipulated
+like stacks with the ]PUSH and ]POP words. In fact, internally, the only
+significant difference between a stack and an array is that a stack is
+anonymous and allocated automatically by the compiler.
+
+3.6.3.1. Syntax
+
+The syntax for addressing arrays is very similar to that of variables. Except,
+that an additional parameter is required for most operations. This index, or
+subscript, is an integer representing a specific location in the array.
+If a given index is negative, then it is taken to be an offset from the end of 
+the array; ie., -1 refers to the last element of an array. It should be noted
+that, beyond this, no bounds checking is performed on array indices. However,
+arrays will grow and shrink as is necessary when used with the ]PUSH, ]POP,
+]INSERT and ]DELETE operators.
+
+3.6.3.2. Definition And initialization
+
+Arrays may be defined and initialized with the ARRAY word.
+
+	{list} 'name array
+	
+The ARRAY word takes a list of initial values, along with a name for the new
+array. For aesthetic reasons it is conventional to end the name of an array
+with the left bracket ([). The following example will define the array foo[
+with the initial values "bar" and "baz":
+
+	[ 'bar 'baz ] 'foo[ array
+
+(If the array is to be accessed concurrently from different threads, then it
+should be declared with the SHARED word)
+
+3.6.3.3. Access
+
+The standard variable access vocabulary is duplicated for use with arrays.
+Words that operate on arrays begin with right bracket ']'. Below are a few
+simple examples:
+
+	foo[ 0 ]@
+
+The above example will load the value of element 0 in the array foo[. Remember
+that, with arrays, any resemblance to a built-in syntax is only an illusion;
+These are all just regular words; Therefore the subscript can be any expression
+that leaves a single integer value on the stack. This is how STOICAL supports
+multi-dimensional arrays.
+
+The following examples will illustrate the use of the stack like set of
+operations available for arrays:
+
+	1 foo[ ]push
+
+The above appends the value 1 to the end of the array foo[, allocating
+additional memory as is necessary.
+
+	foo[ ]pop
+
+These instructions place the last element of the array foo[ onto the parameter
+stack, reducing the size of the array by one element, and freeing memory as
+is necessary.
+
+	3 foo[ 5 ]delete
+
+The above example removes three elements from the array foo[ starting with
+element 5, shifting the remaining elements over to fill the gap, and reducing
+the length of the array.
+
+	[ 'foo 'bar 'baz ] foo[ 5 ]insert
+
+This example inserts the three elements listed into the array foo[ before
+element 5, shifting the right hand portion over to make room, and increasing
+the size of the array.
+
+Due to the way STOICAL stores arrays in the dictionary, you can retrieve the
+number of elements an array by simply loading it like a variable, ie.,
+
+	foo[ ?
+
+Will print out the number of elements in the array foo[.
+
+3.6.4. Associative Arrays (Hashes)
+
+STOICAL is one of the few languages to support associative arrays as a built-in
+data type. Among it's peers in this respect are large, partially compiled
+languages like Perl and Ruby. Associative arrays are most commonly implemented
+using hash tables, hence the use of the word 'hash' throughout this document.
+
+3.6.4.1. Hash Tables Overview
+
+Hashing is actually the process of factoring very large numbers down into much
+smaller numbers of a specific length in bits and of a fairly uniform
+distribution. In the case of Hash Tables, the large number, or key, is the n^8
+bit value of a string of ascii characters. The hashing function will use this
+key to calculate a 32 bit hash value (the small number). The purpose of the
+hashing function is to fix the number of bits, while at the same time retaining
+the uniqueness of the original key. It is referred to as a 'collision' when two
+distinct keys hash to the same value. Collisions are handled automatically by
+the internal hashing functions through queuing. The purpose of generating this
+fixed size integer is that it can then be used as an index into a table. This
+method allows for extremely fast searches. As, instead of linearly comparing
+the key to each entry in the table, all we have to do is caluculate the hash of
+the key and use that as an index.
+
+STOICAL will automatically resize hashes as they expand and contract; However,
+in order for a hash to shrink it is necessary that a program }DELETE keys that
+it no longer finds interesting.
+
+3.6.4.2. Syntax 
+
+The syntax for hashes is very similar to that of arrays. The most prominent
+difference being that the load and store operators take strings representing
+keys as arguments, instead of array indices. The following sections will
+explain and exemplify the use of associative arrays in STOICAL.
+
+3.6.4.3. Definition And Initialization
+
+Associative arrays may be defined and initialized with the HASH word.
+
+	{list} 'name hash
+	
+The HASH word takes a list of initial key/value pairs, along with a name for
+the new hash. For aesthetic reasons it is conventional to end the name of a
+hash with the left parenthesis '('. The following example will define the hash
+foo( with the initial key/value pairs of bar/1 and baz/2.
+
+	[ 'bar 1 'baz 2 ] 'foo( hash
+
+(If the hash is to be accessed concurrently from different threads it
+should be declared with the SHARED word)
+
+3.6.4.4. Access
+
+The standard variable access vocabulary is duplicated for use with hashes.
+Words that operate on hashes begin with right paren ')'. Below are a few simple
+examples:
+
+	foo( 'bar )@
+	mark?
+	if	'does
+	else	'doesn't
+	then	" exist." + =
+
+The above example first retrieves the value of the key "bar" from the hash
+"foo(". The )@ (hash load) word will return the stack marker value if the
+requested key does not exist. In the example the MARK? word is used to test
+for this condition.
+
+The following example will set the value of a key, creating it if it doesn't
+exist.
+
+	3 foo( 'bar )!
+
+The example below will delete a key and discard its value.
+
+	foo( 'bar )delete
+
+Interestingly, because of the way the tables are stored in the dictionary, you
+can retrieve the number of keys in a hash by simply loading it like a variable.
+ie,.
+
+	foo( ?
+
+Will print out the number of keys in the hash foo(.
+
+3.6.4.4.1. Key Iteration:
+
+STOICAL provides an iteration word tailored specifically to associative arrays.
+The words )EACH{ creates a looping construct that will iterate over every key
+in a hash. During this process the word I (index) will push a string
+representing the current key onto the stack. Due to the nature of hash tables
+these keys may appear to be in a random order. Below is an example of hash
+iteration:
+
+	[ 'foo 1 'bar 2 'baz 3 ] 'foo( hash
+
+	foo( )each{
+		i = foo( i )?
+	}
+
+Produces:
+
+	baz3 foo1 bar2
+
+3.7. Using The Dictionary
+
+As was explained in the overview section, the dictionary is the sum of its
+consistent vocabularies. These vocabularies are listed on the vocabulary stack
+and searched linearly, from most recent to oldest. These sections will attempt
+to explain the methods for controlling this behavior to achieve specific
+results.
+
+3.7.1. Scope
+
+STOICAL's organization of the dictionary allows the programmer extreme
+flexibility with his name space; By packaging groups of related words into
+vocabularies he gains conceptual clarity, and increases code re-usability.
+
+For example, one might create a vocabulary branch TERM< to contain a group of
+terminal control words. These definitions could be stored in their own source
+file, to be LOAD'ed by others without the concern of name conflicts.
+
+In fact, the STOICAL distribution includes a library, named 'cryptic', that
+implements an adaptation of Bob Spruit's Cryptic Constructs. This library can
+be loaded, and its definitions exposed, by the following commands:
+
+	'cryptic include
+	cryptic<
+
+	...
+
+	>
+
+3.7.1.1. Definitions
+
+Whenever a new word is created, its definition is appended to the vocabulary
+pointed to by the variable CURRENT; This is usually, though not always, the
+topmost vocabulary on the vocabulary stack. We refer to this is the current
+vocabulary. The word DEFINITIONS is used to change the current vocabulary; It
+sets CURRENT to point to the vocabulary on top of the vocabulary stack.
+
+3.7.2. Vocabularies And Branches
+
+A Branch is a word who's parameter field points to a vocabulary, and who's code
+field points to instructions that push this value onto the vocabulary stack.
+
+The BRANCH word is used to create these new vocabularies. The following example
+creates a branch, FOO<, from the current vocabulary, pushes it on top of the
+vocabulary stack, sets it to be the vocabulary for new definitions, defines the
+word BAR into it, uses the word > to pop it off the vocabulary stack, and
+finally, resets the current vocabulary.
+
+	'foo branch
+	foo< definitions
+		0 'bar constant
+	> definitions
+
+Note that, even though we gave BRANCH the name FOO, the entry it created was in
+fact named FOO<. This forcible behavior is an artifact of STOICAL's
+predecessor, STOIC.
+
+At this point the word BAR is not visible in the current scope. However, at any
+time, the word FOO< can be used to push it back onto the vocabulary stack,
+thereby making all of the words it contains visible again. ie.,
+
+	foo< bar = >
+
+Produces:
+	
+	0
+
+If a branch is no longer needed it can be recursively freed with the DISREGARD
+word. eg.,
+
+	'foo< disregard
+
+Beware of creating self referential vocabulary branches if you intend to later
+DISREGARD them.
+
+3.8. Input/Output
+
+3.8.1. I/O Abstraction
+
+STOICAL provides a simple, yet powerful set of words to handle input and output
+abstraction. The pervasive utilization of this abstraction allows program input
+and output to come from almost any source; Be it a file, socket, database file,
+memory region whatever else you may devise.
+
+The interface consists of four words, along with four similarly named 
+variables. The function of these words is to execute the words pointed to by
+their associated variables. The words pointed to should provide the same
+behavior as their models. The following is a brief description of this
+interface.
+
+name	variable	description			I/O Abstraction words
+----------
+getln	(getln)		Get a line of input; A line ends with \n. If a line
+			could be read, then is it returned as a new string,
+			followed by TRUE.  Otherwise, only the FALSE value is
+			returned.
+			
+putln	(putln)		Output a line; Takes the number of bytes to output from
+			the top of the stack, and a pointer to the source
+			memory region at next to top.
+			
+get	(get)		Get a single character of input; Returning it as its
+			ascii value.
+
+put	(put)		Output the character value on top of the stack.
+
+----------
+
+Initially the associated variables are set to point to the TTY group of words:
+ttygetln, ttyputln, ttyget, and ttyput.
+
+Since STOICAL itself used these words for I/O, the programmer is able to
+redirect, filter and prepare his input however he chooses. You are encouraged
+to continue this practice in your own programs.
+
+The following example causes all line output to put filtered through a
+substitutive regular expression:
+
+
+	(putln) @		% Be nice and save a copy on the stack.
+	
+	'swedenlives : stype 'Volvo x sgi |ford| drop count ttyputln ;
+	() swedenlives (putln) !
+
+	...
+
+	(putln) !		% Restore (putln) to its original state.
+
+
+3.8.2. Terminal
+
+When the process's STDIN and STDOUT are connected to a terminal, all I/O on
+STDIN and STDOUT will be unbuffered, causing GET to return a character as soon
+as one is available instead of waiting for a newline. 
+
+3.8.3. Files
+
+STOICAL attempts to support the entire range of file operations made available
+by the underlying Unix system. The degree to which this is accomplished will
+increase as time goes on. 
+
+First and foremost is the OPEN word. OPEN takes file name and a string
+representing the mode in which the named file should be opened. eg.,
+
+	'foo 'w+ open
+
+Opens the file 'foo' for reading and writing, returning a file handle and TRUE
+if the file could be opened, or FALSE if not. The file handle is used for
+future I/O operations on the file, and should probably be stored in a variable.
+ie.,
+
+	'foo 'r open if{ 'file variable }else{ "could not open file" = }
+
+Once a file is open its handle can be passed to the READ and WRITE family of
+words to perform actual I/O. The following example will read text into a
+dynamically allocated buffer until a newline or end of file is encountered
+(assuming that the variable FILE contains a valid file handle.)
+	
+	file @ readln
+
+If the read operation was a success (not EOF) then the stack will contain a
+string representing the line read followed by TRUE. Or, if the operation
+failed, just the FALSE value.
+
+The other I/O operations that may be performed include: READ, WRITE, WRITELN,
+and FLUSH. Additionally, file names may be given to the word STAT to retrieve
+its statistics.
+
+When the program has finished manipulating a file it should be CLOSE'd. CLOSE
+takes the file handle as its argument and returns nothing. ie.,
+
+	file @ close
+
+3.8.3.1. Directories
+
+The OPENDIR, READDIR, and CLOSEDIR words are used to iterate over the names in
+a given directory. OPENDIR takes the name of a directory as its argument; If it
+succeded, it returns a file handle representing the opened directory and the
+TRUE value. Otherwise, just the FALSE value will be returned.
+
+READDIR must be given this handle as its argument. READDIR will then return
+the name of the next entry in the directory, starting with '.', and TRUE.
+When after the last entry has been read, READDIR will simply return FALSE.
+
+To finish the process, CLOSEDIR must be called with the handle as its argument.
+CLOSEDIR returns nothing.
+
+3.8.4. Sockets
+
+Networking is truly vital in todays world, and yet completely overlooked by
+most of the languages in STOICAL's family. STOICAL provides everything a
+programmer may need to write full featured network applications.
+
+Because of the abstractions in use, once created and connected or bound,
+sockets behave just like ordinary files.
+
+The SOCKET word is used to create a new endpoint. SOCKET accepts three
+arguments these are its domain, type, and protocol. The table below illustrates
+the values available.
+
+example: 'inet 'stream 'tcp socket if{ 'sock variable }else{ "failed!" = }
+
+Domain should be a string matching one of the following:
+
+name		description
+-------
+unix		local (unix) communication
+inet		ipv4 protocols
+inet6		ipv6 protocols
+packet		low level packet interface.
+
+Type should match one of:
+
+name		description
+-------
+stream		reliable, two-way, and connection based.
+dgram		connectionless, unreliable and fixed length.
+seq		a hybrid of stream and dgram.
+raw		raw protocol access.
+
+Protocol can be any protocol that the system supports.
+These should be listed in the /etc/protocols file on most systems.
+Those most likely to be used include "tcp", "udp", and "icmp".
+
+SOCKET will return a file handle and TRUE if success, otherwise FALSE.
+
+Once a socket has been created, it must be bound or connected before it can
+be used.
+
+Once a socket is finished with it should be CLOSE'd. Note that, for certain
+types of pipelined protocols it may be necessary to SHUTDOWN one direction of
+a socket sometime before closing it. This discussion is beyond the scope of this
+document. Please read your system manuals for more information.
+
+3.8.4.1. Incoming
+
+The BIND word is used to bind a socket to a port or Unix path on the local
+machine. BIND takes as arguments a string representing the port or path, and a
+file handle representing a newly created socket. BIND returns a boolean value
+indicating success. eg.,
+
+	sock @ '8080 bind
+
+Before new connections may be accepted, the socket must be marked by LISTEN.
+LISTEN takes a queue length and a file handle. The queue length is the maximum
+number of incoming connections that the operating system should keep waiting
+while a request is being completed. LISTEN returns nothing. eg.,
+
+	5 sock @ listen
+
+Once all of this is done we can begin to accept incoming connections. The word
+ACCEPT takes a file handle as an argument, and returns a new handle
+representing the connection accepted. It is the handle returned by ACCEPT that
+future I/O operations should be performed on. eg.,
+
+	sock @ accept client !
+
+At this point the new socket should behave exactly like an ordinary file. One
+useful operation that could be performed now is SENDFILE. SENDFILE is used to
+transfer data from files to sockets from inside the kernel. Avoiding
+unnecessary copies between kernel and user space. SENDFILE takes four 
+arguments:
+
+	start count dst src sendfile 
+
+Here, start and count represent the region of the source file to copy.  On
+Linux the source file handle should never represent a socket. SENDFILE returns
+the number of bytes actually copied.
+
+3.8.4.2. Outgoing
+
+The word CONNECT initiates an outgoing connection on the given socket, returning
+a boolean value indicating success. Additional arguments required by CONNECT
+are the name and port (or path) of the remote endpoint. ie.,
+
+
+	'80 'stoical.sf.net sock @ connect
+
+After a socket has been CONNECT'ed you may use it like an ordinary file.
+
+3.10. Threads
+
+STOICAL uses the POSIX Threads interface to the operating system's lightweight
+processes. Threads are used to achieve concurrency in execution, efficiency in
+resources, and elegance in source code. Although the concepts of multi-threaded
+programming are beyond the scope of this reference, the following sections will
+attempt to explain the details of STOICAL's interface.
+
+3.10.1. Creation
+
+The THREAD word takes as its argument a reference to the word to serve as the
+new threads point of entry. THREAD then returns a reference to the new thread.
+ie.,
+
+	() foo thread detach
+
+3.10.2. Data
+
+When a new thread is born it inherits many pieces of information from its
+parent. This includes a copy of the parameter stack up to the first marker
+value, a copy of the vocabulary stack, open files, and etc. The new thread will
+have a private vocabulary for containing new definitions, named PRIVATE<. As
+well as fresh, empty loop, return, and compile stacks.
+
+3.10.2.1. Consistency
+
+Because of the way the dictionary is arranged, new threads will be able to
+invoke their parents words without conflict. However, if a thread is intended
+to read or write variables defined in vocabularies accessible to its parent,
+then the parent should declare them SHARED at the time of their definition.
+
+The SHARED word tells STOICAL that access to the given object should be
+serialized between threads. This eliminates the need for the programmer to
+explicitly handle all of the various race conditions usually involved in
+multi-threaded programming. The granularity of SHARED locking is currently per
+word. That is to say, elements of an array will not be locked individually.
+Below is an example of the definition of one such implicitly locked variable.
+
+	10 'bar variable shared
+
+3.10.3. Destruction
+
+A thread ceases to exist once the word given as its point of entry has
+terminated.  In order for all resources associated with a given thread to be
+released, it is necessary for the creator of the thread to JOIN or DETACH it.
+
+JOIN accepts a thread reference as its argument, and returns the given threads
+exit value. If the thread is still running when JOIN is called, then JOIN will
+block until it is finished. DETACH is similar, except that it does not wait for
+the thread to end before returning. Threads that don't return any useful
+information should be DETACH'ed as soon as they are created.
+
+A thread may terminate itself at any time by invoking the word EXIT. EXIT takes
+an integer value as its argument; This is the value that JOIN will then return
+to its parent.
+
+Likewise, a parent may terminate a child thread at any time by passing its
+reference to the word CANCEL. CANCEL returns nothing.
+
+The ME word can be used to retrieve a reference to the calling thread. However,
+it should be noted that a thread which JOINs or DETACHs itself is brain
+damaged.
+	
+10. Portability
+
+10.1. Compiler
+
+STOICAL can be compiled on the wide variety of hardware supported by the Linux
+kernel and GNU tools. It is even possible to compile STOICAL on any Unix
+system for which GNU C Compiler can also be compiled by disabling the Linux
+specific portions. In fact, by disabling enough features, one could compile
+for DOS. Although, that wouldn't leave much of a language.
+
+STOICAL has been built and tested on the following platforms:
+
+Sparc - Linux 2.2 Debian 2.2
+Alpha - Linux 2.2 Debain 2.2
+PPC RS/6000 Linux 2.4 Debian 2.2
+Intel x86/SMP Linux 2.4 Debian 2.3
+Intel x86 - FreeBSD 4.5-STABLE
+
+RS/6000 AIX 3.1 would be on the list too, but I seem to have misplaced my boot
+media. ;-) 
+
+10.2. Source
+
+Thanks to the abstractions and data representations inside the compiler,
+programs written in STOICAL should be 100% portable across platforms.
+Providing, of course, that the build options on the target machine satisfy the
+requirements of the particular program (ie., threads, regexs, ... ).
+
+11. Glossary
+
+11.1. Symbols
+
+STOICAL uses a plethora of symbols designed to increase the brevity of source
+code. Below is a list of common symbols along side their English
+pronunciations. If the reader is already familiar with Forth, then most of
+these should be second nature.
+
+	!	store
+	@	load
+	?	fetch, query, conditionally.
+	$	dollar, often string related.
+	%	percent, comment.
+	#	sharp, hash, the number sign (hence, #MATCH)
+	^	circumflex, continuation.
+	&	ampersand.
+	*	asterisk, glob, bah
+	.	dot, traditionally the symbol of pointers
+	,	comma
+	-	minus, dash, hyphen, to negate or reverse
+	+	plus
+	=	equals
+	(	open paren, used for iteration and hashes
+	)	close paren
+	{	open brace, used for clauses
+	}	close brace
+	[	open bracket, used for lists and array indices
+	]	close bracket
+	<	open angle bracket, left arrow, into
+	>	close angle bracket, right arrow, out from
+	"	double quote
+	'	quote. sometimes used as a suffix, meaning prime
+	`	tick, back-tick
+	~	tilde
+	|	vertical bar, bar
+	\	backslash, up
+	/	slash, forward slash, down
+	_	underscore
+	:	colon, definition
+	;	semicolon, termination
+
+
+11.2. Terms
+
+STOICAL has inherited a large amount of jargon from its predecessors Forth and
+STOIC. What's more, it has created quite a bit of its own. Listed below are
+some of the more obscure bits.
+
+( This list is hardly complete )
+	
+Word
+	A procedure name consisting of sequence of ascii characters separated
+	by white space. Also the procedure itself.
+	
+Clause
+	A nameless, scope-less procedure.
+	
+Stack
+	A Last In First Out buffer in memory. Often the parameter stack, used
+	to pass data between invocations of WORDs
+
+Vocabulary
+	A group of related WORDS
+	
+Dictionary
+	The collective contents of all the vocabularies listed on the
+	vocabulary STACK.
+
+Colon Definition
+	The definition of a procedural WORD.
+
+Thread
+	Unix light-weight process. A program may have many concurrent THREADs
+	of execution.
+	
+TOS	
+	Top Of Stack - The newest item on the parameter STACK.
+	
+TOS-1
+	Next To Top of stack, and so on.
+	
+	
+	
+
+
+

@@ -1,0 +1,9 @@
+kernel.o: kernel.c kernel.h config.h debug.h hash.h help.h words.c \
+ builtins.h
+term.o: term.c
+dict.o: dict.c kernel.h config.h debug.h hash.h
+string.o: string.c kernel.h config.h debug.h
+hash.o: hash.c kernel.h config.h debug.h hash.h
+debug.o: debug.c kernel.h config.h debug.h
+mem.o: mem.c kernel.h config.h debug.h
+signal.o: signal.c kernel.h config.h debug.h

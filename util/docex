@@ -1,0 +1,80 @@
+#! ../stoical
+
+% Program to extract documentation from the STOICAL sources.
+
+args[ @ 3 lt
+if{
+	"usage: docex file1 ... fileN dir \n(where 'file' contains" ^
+	" documentation to extract)\n" + = bye
+}
+
+0 'state	variable
+0 'cat(		hash
+0 'dsc(		hash
+0 'ofil 	variable
+0 'fil		variable
+0 'dir		variable
+
+args[ args[ @ 1- ]@ '/ + dir ! dir @ 511 mkdir drop
+
+'wopen : dup dir @ swap + 'w open drop ;
+'fputln : ofil @ write drop ;
+() fputln (putln) !
+
+args[ @ 1- 1
+loop{
+	args[ i ]@ dup "evaluating " swap + '\n + count ttyputln 'r open
+	if{ fil ! }else{ "error opening input file.\n" count ttyputln bye }
+
+	{ fil @ readln }while{
+		state @ 0 eq
+		if{
+			dup
+			|^(/\*\*\*\|% %%)[ \t]*([^ \t]+)[ \t]+(.+) \*/|
+			if{
+				swap dsc( swap )!
+				drop drop drop
+			}else{
+				|^(/\*\*\|% %)[ \t]*\(([^)]*)\)[ \t]+([^ \t]+)|
+				if{
+					swap dup cat( swap )@ dup
+					mark?
+					if{
+					      drop wopen tuck swap
+					      tuck
+					      cat( swap )!
+					      swap ofil !
+					      "\n----{ " =
+					      dup
+					      dsc( swap )@ dup mark? if{
+					        drop
+						"catagory " swap +
+						" undefined!\n" +
+						count ttyputln bye
+					      }else{ = drop }
+					      " }- - - -\n" =
+					      
+					}else{
+					      nip ofil !
+					}
+					'\n = = '\n =
+					drop drop
+					1 state !
+				}
+			}
+		}else{
+			state @ 1 eq
+			if{
+				dup |\*/\|^% %|
+				if{
+					0 state !
+					drop drop
+				}else{
+					"   " x s |^[\t ]*[*%] ?| drop =
+				}
+			}
+		}
+	}
+	fil @ close
+}
+

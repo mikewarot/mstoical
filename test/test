@@ -1,0 +1,7 @@
+#! ../stoical
+
+% Test utility words.
+0 'tst	variable
+0 'fail	variable
+'ok? : tst 1+! tst @ <#> type tab if{ 'ok }else{ 'failed fail 1+! } '\n + = ;
+

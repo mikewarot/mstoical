@@ -1,0 +1,313 @@
+#! /usr/local/bin/stoical
+
+% This file contains high-level definitions to be automatically loaded by
+% STOICAL at startup. Documentation is automatically generated from the
+% comments herein, so their format must be adhered to.
+
+radix @ warnings @ false warnings ! 10 radix !
+
+% maybe colon should mimic stoic and force nesting depth 0.
+
+% %(dictionary) : (*)
+% "'foo : ... ;"
+% Begin colon definition. Execute :{.
+% %
+': :{ () :{ exec } immediate
+% %(dictionary) ; (*)
+% "'foo : ... ;"
+% Terminate colon definition. Execute }.
+% %
+'; :{ () } exec } immediate
+% %(dictionary) }> (*)
+% "{ }>"
+% Push the address of the preceding clause onto the parameter stack.
+% Short-hand for "} {}>".
+% %
+'}> : () } exec {}> exec ; immediate
+
+% define types and type checking words
+
+% %(dictionary) types<
+% The TYPES< vocabulary contains constants that map type names to their numeric
+% values. The the word :( pushes this vocabulary onto the vocabulary stack to
+% expose the names durring definition. Both the abbreviated and verbose
+% type names may be used here. Below is a list of the short and long names:
+% 
+% short		long
+% --------
+% *		bah	( don't care )
+% f		float
+% s		string
+% r		reference
+% p		pointer
+% io		stream 	( file / socket )
+% a		array
+% h		hash 
+% c		clause
+% % 
+'types branch
+types< definitions
+% short names.
+	0	'*		fconstant
+	2	'f		fconstant
+	3	's		fconstant
+	4	'r		fconstant
+	5	'p		fconstant
+	6	'io		fconstant
+	7	'a		fconstant
+	8	'h		fconstant
+	9	'c		fconstant
+% long names.
+	*	'bah		fconstant
+	f	'float		fconstant
+	s	'string		fconstant
+	r	'reference	fconstant
+	p	'pointer	fconstant
+	io	'stream		fconstant
+	a	'array		fconstant
+	h	'hash		fconstant
+	c	'clause		fconstant
+> definitions
+
+':( : () mark <c () types< exec ; immediate
+'): : () ):{ exec ; immediate
+
+% %(dictionary) constant
+% "1 'foo CONSTANT"
+% Define a new constant with the name at TOS and the value of TOS-1.
+% %
+'constant :( f s ): fconstant ;
+'constant :( s s ): $constant ;
+'constant :( * s ): fconstant ;
+
+% %(dictionary) variable
+% "1 'foo VARIABLE"
+% Define a new variable with the name at TOS and the value of TOS-1.
+% %
+'variable : constant ((variable)) ;
+
+% %(binary) +
+% "1 1 +"
+% Add TOS and TOS-1. In the case of strings, TOS will be appended to TOS-1.
+% %
+'+ :( f f ): add ;
+'+ :( s s ): cat ;
+
+% %(io) =
+% Type the top of stack in a pretty fashion.
+% %
+'= :( f ): f. ;
+'= :( s ): msg ;
+
+% %(binary) eq
+% Compare TOS against TOS-1 for equality
+% %
+'eq :( f f ): feq ;
+'eq :( s s ): $eq ;
+
+% define some type checking wrappers for common problem words.
+'count :( s ): count ;
+'stype :( p f ): stype ;
+
+% %(conditional) if{ (*)
+% "n if{ ... }"
+% Execute following clause if TOS is not equal to FALSE. Short-hand for "{if
+% {".
+% %
+'if{		: () {if <c	()	{	exec		; immediate
+% %(conditional) }else{ (*)
+% "if{ ... }else{ ... }
+% Terminate IF{ clause. The following clause will be executed if the preceding
+% IF{ evaluated to FALSE. Short-hand for "} {else {".
+% %
+'}else{		: () }	exec	() {else	exec ()	{ exec	; immediate
+% %(iterative) }until (*)
+% "{ ... n }until"
+% Execute preceding clause until TOS is not equal to FALSE. Short-hand for
+% "{ ... n } {until"
+% %
+'}until		: () } 	exec	() {until	<c		; immediate
+% %(iterative) }while{ (*)
+% "{ ... n }while{ ... }"
+% Evaluate precedeing clause. If not equal to FALSE, then execute following
+% clause. Repeat ad infinitum.
+% %
+'}while{	: () } 	exec	() {while	exec () { exec	; immediate
+% %(iterative) loop{ (*)
+% "hi lo loop{ ... }"
+% Execute the following clause HI times, running an index from LO to HI. These
+% indices may be retrieved through the I family of words. No action is
+% performed if HI is less than or equal to LO. Short-hand for "{loop {".
+% %
+'loop{		: () {loop exec	() { exec	; immediate
+% %(iterative) +loop{ (*)
+% "hi lo +loop{ ... incr }"
+% Similar to LOOP{, except that the index is incremented by the value at TOS
+% as of the end of the clause, instead of by one. Short-hand for "{+loop {"
+% %
+'+loop{		: () {+loop exec () { exec	; immediate
+% %(iterative) )each{ (*)
+% "hash( )each{ i = }"
+% Iterate over the keys of the hash referrenced by TOS; Executing the following
+% clause once for each key. Within this context "I" pushes a string representing
+% the current hash key. Due to the nature of hash tables, keys may appear to
+% be in random order.
+% %
+')each{		: () ){each exec () { exec	; immediate
+% %(iterative) ( (*)
+% "5 ( ... )"
+% Begin 'parenthesis loop'. Iterate over the following clause TOS times, running
+% and index from TOS to 1. Execute {(, Execute {. 
+% %
+'(		: () {( exec () { exec ; immediate
+% %(iterative) ) (*)
+% "5 ( ... )"
+% Terminate parenthesis loop. Execute }, push the address of ({)) onto the
+% compile stack.
+% %
+')		: () } exec () ({)) <c ; immediate
+
+% ----- define the more traditional interface to flow control.
+% %(conditional) if (*)
+% "n IF ... then"
+% Conditionaly execute the instructions. The instructions following IF will be
+% executed if TOS is not FALSE upon invokation.
+% %
+'if	: () if{	exec ; immediate
+% %(conditional) else (*)
+% "n if ... ELSE ... then"
+% Instructions following ELSE will be executed if the preceding IF evaluated
+% to FALSE.
+% %
+'else	: () }else{	exec ; immediate
+% %(conditional) then (*)
+% "n if ... else ... THEN"
+% Terminate preceding IF/ELSE.
+% %
+'then	: () }		exec ; immediate
+% %(iterative) begin (*)
+% "begin ..."
+% Mark the beginning of an END/REPEAT construction.
+% %
+'begin	: () {		exec ; immediate
+% %(iterative) end (*)
+% "begin ... n end"
+% Jump back to the preceeding BEGIN if TOS equals FALSE.
+% %
+'end	: () }until	exec ; immediate
+
+% TODO: reimpelment REPEAT.
+
+% %(dictionary) ~ - (new)
+% "'foo ~"
+% This word, pronounced "defer", is equivalent to "'foo address exec".
+% %
+'~ : address exec ;
+
+% numerical output.
+
+% %(math) #
+% "<# # #>"
+% Print single digit in current radix. Divide the number at TOS by the current
+% radix, leaving the quotient on the stack. Convert the remainder to an ascii
+% digit and output it using #put.
+% %
+'# : radix @ /mod #a #put ;
+
+% %(math) #put
+% "40 <# #s #>
+% Convert entire number to a string and output it. Execute # until TOS becomes
+% zero. # will always be executed at least once.
+% %
+'#s : { # dup eqz }until ;
+
+% %(math) <#>
+% Convert the number at TOS to a string. Leave the length at TOS, and a pointer
+% to the first character of the string at TOS-1.
+% %
+'<#> : dup <l abs <# #s l> ltz if{ ascii - #put } #> ;
+
+% %(system) (env) - (new)
+% "'PWD (env)"
+% Declare TOS to be a string constant, and define its contents as the value of
+% the environment variable sharing its name (or an empty string if undefined).
+% %
+'(env) : dup env> dup if{ }else{ drop ' } swap constant ;
+
+% %(var) ?
+% "0 'foo variable foo ?"
+% Type the contents of the variable at TOS.
+% %
+'? : @ = ;
+
+% %(array) ]? - (new)
+% "ary[ 0 ]?"
+% Type the contents of element TOS of array TOS-1
+% %
+']? : ]@ = ;
+
+% %(array) )? - (new)
+% "hash( 'foo )?"
+% Type the value of the key TOS in the hash TOS-1
+% %
+
+')? : )@ = ;
+
+% %(var) @@
+% "bar 'foo variable foo @@"
+% Indirectly load TOS. 
+% %
+'@@ : @ @ ;
+
+% %(var) 1+!
+% Increment the variable addressed by TOS.
+% %
+'1+! : dup @ 1+ swap ! ;
+
+% %(math) octal
+% Set radix to octal.
+% %
+'octal : 8 radix ! ;
+
+% %(math) decimal
+% Set radix to decimal.
+% %
+'decimal : 10 radix ! ;
+
+% %(math) hex
+% Set radix to hexadecimal.
+% %
+'hex : 16 radix ! ;
+
+% %(io) cr
+% Output a newline.
+% %
+'cr : '\n = ;
+
+% %(io) space
+% Output a space.
+% %
+'space : 32 put ;
+
+% %(io) spaces
+% Output TOS spaces.
+% %
+'spaces : ( space ) ;
+
+% %(io) tab
+% Output a tab character.
+% %
+'tab : 9 put ;
+
+% %(dictionary) recurse (*)
+% "'factorial : dup 1 ne if dup 1- recurse * then ;"
+% Recursively execute the word being defined. Equivalent to SELF EXEC.
+% Recursion beyond the depth of the return stack is not currenly possible.
+% %
+'recurse : () self <c () exec <c ; immediate
+
+warnings ! radix !
+
+'user branch
+user< definitions
+

@@ -1,0 +1,53 @@
+.de Op
+.BR -\\$1
+..
+.TH @PACKAGE_STRING@ "May 5 2002" "@PACKAGE_STRING@"
+.SH NAME
+stoical \- STack Oriented Interactive Compiler Adapted to Linux (/Apt to Life?)
+.SH SYNOPSIS
+stoical [-h] [-l lib] [-f] [ file arg1 ... argN ]
+.SH DESCRIPTION
+
+I'm not the first man to have her, and I certainly won't be the last.
+She is not soft. She is not perfect. And though all her apparent beauty may be
+a mere product of my imagination, she's mine for the moment and I will make a
+mark on her; One so deep, so colorful and passionate, that she will carry it
+forever with regret. A bondage to guilt, for all the pain that she has caused
+others.  
+.B STOIC
+, you torrid, wanton creature you! You make me sick. Kiss me!
+
+.B STOICAL
+is a modern re-implementation of the classic stack language STOIC. It
+hosts features not present in the original incarnation, and some not present in
+many languages today. These include, POSIX threading, POSIX Regular Expressions
+dynamic memory, sockets, floating point arithmetic, passive garbage collection,
+passive type-checking, and more. 
+.B STOIC
+, a Forth like language, was conceived circa 1977 by Jonathan M. Sachs at the
+Massachusetts Institute of Technology.
+.SH OPTIONS
+The program understands the following command line options.
+.TP
+.Op h 
+shows a short usage message.
+.TP
+.Op l
+change the library root.
+.TP
+.Op f
+force filename / no more options. useful when file begins with '-'
+.SH FILES
+The following files on your system are related to stoical.
+.TP
+.I "@prefix@/bin/stoical"
+the stoical executable.
+.TP
+.I "@prefix@/lib/stoical/"
+STOICAL library files.
+.SH SEE ALSO
+.BR forth (1)
+.SH AUTHOR
+The language
+.B STOICAL
+has been brought to you by Jonathan M. Liles <wantingwaiting@users.sf.net>.

@@ -1,0 +1,16 @@
+#! ../stoical
+
+% Test Threads
+
+'test load
+
+"Testing threads...\n" =
+
+0 'foo variable shared
+
+'thr : 5 foo ! foo @ 5 eq ok? 10 exit ;
+() thr thread join 10 eq ok?
+foo @ 5 eq ok?
+
+fail @ exit
+

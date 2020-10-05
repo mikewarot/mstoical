@@ -1,0 +1,123 @@
+
+Above and beyond the grace and efficiency of its syntax, STOICAL
+provides several additional features that make it a truly powerful
+tool in any programmer's arsenal. Among these are:
+
+
+Extensibility.
+	
+	This may be something of a buzz word these days, but
+	Forth like languages have been extensible from their very
+	beginning. To understand what this means you must first
+	consider a language that is not extensible. We shall
+	take C to be an example. Though it is true that you can
+	define additional functions or procedures in C, you cannot
+	extend the language itself. The syntax and operators are fixed
+	and unyielding. In an extensible language, however, all of these
+	things are liquid, and may be altered at any time. In STOICAL,
+	the programmer may define his program as a little language
+	in its own right.	
+
+Interactivity.
+
+	STOICAL, like its predecessor, is completely interactive.
+	It incrementally compiles and executes instructions and
+	definitions as you enter them. This allows for easy testing
+	and development of applications. And because of its speed you
+	don't have to suffer for this convenience.
+
+Cooperation
+	
+	Many people in my circles seem to be of the opinion that all
+	Reverse Polish languages must, by very definition, also be their
+	own operating system*. This is foolish. I like my operating system,
+	and I like other computer languages. Moreover, I like them all to
+	interact in an intelligent and useful way. It is for this reason that
+	STOICAL strives to exploit the operating system and environment
+	in any way that it can.
+
+	* - The most notable exception being Jason Evans and his Onyx
+	extension language.
+
+Networking.
+
+	For the past 10 years a large percentage of computer programs have
+	had to deal with the interconnection of systems in some way.
+	Currently, nearly every application must deal with the extreme
+	interconnection known as the Internet. To facilitate this, STOICAL
+	supports socket based networking in a straight forward, familiar
+	and empowering fashion.
+	
+POSIX Threading.
+
+	Obviously, networking isn't of much use without concurrency of
+	some kind, and threads are the best form of concurrency made 
+	available by the operating system. STOICAL makes handling
+	multiplicity uncommonly simple.
+
+POSIX Regular Expressions.
+
+	STOICAL integrates support for the POSIX Regular Expression
+	(regex) pattern matching facility, a truly striking feature for a
+	stack based language. In fact, regex's are more integrated with
+	STOICAL than they are with languages specially designed for them,
+	such as Perl.
+
+Associative Arrays (Hash Tables).
+
+	This powerful programming tool is overlooked by far too many languages.
+	Associative arrays are one of those features that most languages never
+	provide, even though you really must have them to write anything of
+	consequence. Oddly, almost all modern compilers use associative arrays
+	internally, to store their symbol table data. In any event, STOICAL
+	integrates hash table based associative arrays seamlessly with the
+	language; Another ground breaking feature in the world of RPN.
+
+Passive Garbage Collection.
+
+	Many modern, dynamic languages put a great deal of effort
+	into active, mark and sweep garbage collection algorithms and
+	implementations. The design of some of these languages makes
+	this necessary, because the object name space is an infinite
+	resource. However, in a stack based language the name space
+	is replaced by a finite store, quite obviously referred to
+	as 'the stack'. Because this stack can only hold a specific
+	number of items at any one time, garbage collection becomes
+	a simple matter of trust. The programmer trusts the language
+	not to free his memory until a reasonable amount of activity
+	has taken place on the stack. Garbage collection is implemented
+	internally as a FIFO stack, which is, unlike the parameter stack,
+	infinite. However, only the topmost X elements of this stack ever
+	have actual storage allocated to them. This fits well with
+	normal usage patterns of the language. If the programmer needs
+	a dynamic object to remain permanently, he simply does the
+	obvious thing, and files it into the dictionary.
+	Currently, nameless, non constant strings are the only dynamically
+	allocated objects in the language; The dictionary grows and shrinks
+	dynamically, but it isn't an object, and doesn't require garbage
+	collection.
+	
+Passive Type-checking.
+
+	Passive type-checking means that only words which desire type-checking
+	will incur any performance penalty, and even then the extra computation
+	is miniscule. The type-checking system also allows word (operator)
+	overloading. This is why you can use the word + (plus) to add figures,
+	as well as to concatenate strings.
+	
+Floating Point Arithmetic.
+
+	Anyone who has used a Forth system in the past knows what a headache
+	it can be to do floating point calculations. In STOICAL, this is
+	completely transparent, as floats and integers occupy the same
+	stack and behave identically.
+
+More.
+
+	Of course, it is 4:00 in the morning right now, and I cannot
+	be expected to remember every exciting little detail.
+	Just know that you will come to appreciate many new things about
+	language in time, and likely discover features that even I have
+	overlooked.
+
+

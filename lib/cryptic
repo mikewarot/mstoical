@@ -1,0 +1,33 @@
+#! /usr/local/bin/stoical
+% 04/24/02 - Jonathan Moore Liles.
+% Library to approximate Rob Spruit's Cryptic Constructs, in STOICAL.
+
+'cryptic branch
+
+cryptic< definitions
+
+'?{	: () if{	exec ; immediate
+'}{	: () }else{	exec ; immediate
+'?}	: () }until  	exec ; immediate
+'?}{	: () }while{	exec ; immediate
+
+'xx{	: () loop{	exec ; immediate
+
+> definitions
+
+cryptic<
+
+;f
+
+Translations:
+
+Traditional			Cryptic
+-------
+if{ ... }			?{ ... }
+if{ ... }else{ ... }		?{ ... }{ ... }
+
+{ ... }until			{ ... ?}
+{ ... }while{ ... } 		{ ... ?}{ ... }
+
+n n loop{ ... }			xx{	}
+

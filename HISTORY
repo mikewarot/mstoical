@@ -1,0 +1,52 @@
+
+STOICAL is a modern adaptation of the classic stack language STOIC. STOIC was
+developed circa 1977 by Jonathan M. Sachs while at the Biomedical Engineering
+Center for Clinical Instrumentation under the Massachusetts Institute of
+Technology Program in Health Sciences and Technology. STOIC was itself preceded
+by a language called FORTH, developed circa '68 for the National Radio
+Astronomy Observatory in Charlottesville Virginia by Charles H. Moore. Moore,
+though clinically insane, has continued to extend his language over the years.
+At the time of this writing FORTH is known to him as colorForth; One imagines
+that these colors are much like those present in his twisted visions and terror
+filled dreams. Sachs, however, is now dabbling in software for the Pocket PC
+architecture, and appears to have all but forgotten about STOIC. At one point
+in the early '80s, a fellow named Ernest E. Bergmann attempted to reincarnate
+STOIC in a language dubbed PISTOL (Portably Implemented STack Oriented
+Language). This implementation had its roots in BDS C, and remains something of
+an amusement.
+
+This sordid history is further complicated by the fact that the components
+of my name, Jonathan and Moore, were attributed to me by my father in honor
+of these two men, Sachs and Chuck.
+
+I came to work on STOICAL by way of my quest for the perfect language. You see,
+I recently ran across a language called Onyx, developed by Jason Evans. Onyx
+has its roots in Forth and PostScript. Jason had never even heard about STOIC,
+although his language implements features that are strikingly similar to
+those I remembered reading about in the papers that Sachs gave my father. The
+source code and documentation for Onyx exceed 10 megabytes in size, and
+the runtime is sluggish compared to more simplistic implementations. This
+can be attributed to the extra storage and calculation used to support
+multi-threaded execution, type-checking and exception recovery. I found this
+to be quite divergent from the capabilities, and thereby efficiency of STOIC.
+So, I set out to port STOIC to a modern environment and compare it with the
+alternatives. This effort soon failed as STOIC's assembly language source is
+intrinsically tied to the system for which it was written. So, if Sachs
+doesn't care about abstraction, why should I? At this point I could almost
+feel the beast of free software rising up inside me. "Go forth! Re-implement
+and adapt!", the creature shouted out from within my gut. And hence forth this
+creation shall be known to men of earth as STOICAL; And he shall stop times to
+reflect on its initial five letters. These five commandments, if you will,
+that STOICAL lives up to, and more than that, expands upon. I recite them now:
+
+STack: because of the way she walks.
+Oriented: for that hungry gleam in her eyes.
+Interactive: because she wears not panties!
+Compiler: need I say more!?
+
+Interestingly enough, this brings me back to the point I made previously
+about the mental state of one Chuck H. Moore. For reasons that I've yet to
+fully appreciate, both Hewlett Packard calculators and RPN computer languages
+appear to have an unhealthy effect on the human psyche. Luckily, however,
+they also happen to stimulate the pleasure centers of the brain. Take note;
+You have been warned, and yet you have also been encouraged.

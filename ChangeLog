@@ -1,0 +1,68 @@
+2002-05-06 Jonathan M. Liles <wantingwaiting@users.sf.net>
+
+	* util/genvim: added syntax folding.
+	
+	* Makefile.in, util/genvim: generate vim syntax from documentation.
+	
+2002-05-05 Jonathan M. Liles <wantingwaiting@users.sf.net>
+
+	* kernel.c: fixed call to term_restore
+
+	* doc/stoical.1: added man page
+
+	* hash.c (hash_next): fixed member descent
+
+	* strings.c (interpolate): added mode option
+
+	* words.c (compile): run regex's through interpolate mode 1
+	
+	* util/docex: build one big file instead of many small ones
+
+	* debain/: added debian package support
+	
+	* Makefile.in, src/Makefile.in, config.h.in,
+	configure.in: Use autoconf
+	
+	* all: Built and tested on FreeBSD 4.5
+	
+2002-05-03 Jonathan M. Liles <wantingwaiting@users.sf.net>
+	
+	* NEWS: Version .06 released
+	
+	* words.c: added SEEK
+	
+2002-05-02 Jonathan M. Liles <wantingwaiting@users.sf.net>
+
+	* words.c: New type checking system.
+	
+	* kernel.c: No warnings with -Wall.
+	
+	* kernel.c: Much more informative output on errors.
+
+2002-04-29 Jonathan M. Liles <wantingwaiting@users.sf.net>
+
+	* words.c: All flow control is now based on code blocks (clauses).
+	
+	* debug.c, signal.c: Informative diagnostics displayed on exceptions.
+	
+2002-04-23 Jonathan M. Liles <wantingwaiting@users.sf.net>
+
+	* hash.c, hash.h,
+	words.c: Support for dynamically sized, hash based associative arrays.
+	
+	* doc/words: Documentation now generated from source code.
+	
+	* vim/: Vim syntax highlighting files included.
+	
+	* kernel.c: Intelligently accept command line arguments.
+	
+	* doc/Stoical: Now with -gasp- general documentation!
+
+2002-04-19 Jonathan M. Liles <wantingwaiting@users.sf.net>
+
+	* NEWS: Version .02 released.
+	
+	* dict.c: Better memory management for vocabulary entries.
+	
+	* words.c: Full POSIX compatible regular expression support.
+

@@ -1,0 +1,15 @@
+stoical (0.1.8) unstable; urgency=low
+
+  * rules: Copy vim.tar.gz into /usr/share/doc/stoical
+
+ -- Jonathan M. Liles <wantingwaiting@users.sf.net>  Sat, 6 May 2002 05:58:21 -0600
+
+stoical (0.1.7) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Jonathan M. Liles <wantingwaiting@users.sf.net>  Sat, 5 May 2002 23:00:00 -0600
+
+Local variables:
+mode: debian-changelog
+End:

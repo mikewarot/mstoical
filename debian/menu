@@ -1,0 +1,4 @@
+?package(stoical):needs="text" \
+	section="Apps/Programming" \
+	title="STOICAL" \
+	command="/usr/bin/stoical"

@@ -1,0 +1,23 @@
+#! ../stoical
+
+% Test associative arrays
+
+'test load
+
+"Testing associative arrays...\n" =
+
+[ 'foo 1 'bar 2 'cat 3 ] 'hash( hash
+
+% initialization
+hash( 'bar )@ 2 eq ok?
+% iteration
+0 hash( )each{ hash( i )@ + } 6 eq ok?
+% replace
+'foo hash( 'bar )! hash( 'bar )@ 'foo eq ok?
+% insert
+4 hash( 'moo )! hash( 'moo )@ 4 eq ok?
+% delete
+hash( 'bar )delete hash( 'bar )@ mark? ok?
+
+fail @ exit
+
