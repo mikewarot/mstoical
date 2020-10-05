@@ -95,7 +95,7 @@ struct voc_item builtins[] = {
 { A_WRD,"bool",	adr(bool) },
 { A_WRD,"iliteral",adr(iliteral) },
 { A_WRD,"radix",	adr(radix) },
-{ A_WRD,"#match",	adr(hash_match) },
+{ A_WRD,"#match",	adr(hashmatch) },
 { A_WRD,"args[",	adr(args_bracket) },
 { A_WRD,"load",	adr(load) },
 { A_WRD,"include",adr(include) },

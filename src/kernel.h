@@ -78,6 +78,8 @@
 #define TRUE	-1
 #define FALSE	0
 
+typedef unsigned int  ub4;   // other C versions just make it work
+
 typedef unsigned char type_t;
 
 /* all strings on the stack will have this format. */

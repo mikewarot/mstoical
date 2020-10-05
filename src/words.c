@@ -2009,8 +2009,8 @@ end()
 begin(hash_put)
 	/* Place character represented by the value at TOS into
 	 * the buffer. Decrement the pointer, and increment the count. */
-	*(--(char*)hash_ptr.parm.v.p) = fpop(sst);
-	
+	*((char*)hash_ptr.parm.v.p) = fpop(sst);
+	hash_cnt.parm.v.p--;
 	hash_cnt.parm.v.f++;
 end()
 begin(hash_a)
@@ -2021,8 +2021,8 @@ begin(hash_a)
 
 	fpush(sst,( i > 10 ? i + 48 + 7 : i + 48));
 end()
-begin(hash_match)
-	rpush(sst,&hash_match);
+begin(hashmatch)
+	rpush(sst,&hashmatch);
 end()
 /**(system) args[
  * 
@@ -2789,7 +2789,7 @@ begin(l_)
 	ip++;
 	a = (cell*)ip;
 	
-	((cell*)ip)++;
+	(cell*)ip++;
 	ip--;
 
 	push(sst,*a);
