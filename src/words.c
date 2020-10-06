@@ -2337,9 +2337,8 @@ begin(vocab)
 	{
 	
 #ifdef PROFILE
-		printf("\'%-20s : size=%i, called=%i\n",  ornull(entry->name),
-							 entry->size *
-							 sizeof( ip ),
+		printf("\'%-20s : size=%li, called=%i\n",  ornull(entry->name),
+							 entry->size * sizeof( ip ),
 							 entry->called );
 #else
 		printf("\'%-20s :\n",  ornull(entry->name) );
@@ -3015,7 +3014,7 @@ end()
  */	
 begin(r_)
 	regex_t *reg;
-	int matches = hash_match.parm.v.f;
+	int matches = hashmatch.parm.v.f;
 	regmatch_t p[matches];
 	char *s;
 

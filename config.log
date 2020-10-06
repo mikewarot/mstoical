@@ -533,7 +533,7 @@ configure:4670: $? = 0
 configure:4670: result: yes
 configure:4676: checking for _doprnt
 configure:4676: gcc -o conftest -O0   conftest.c -lm  >&5
-/usr/bin/ld: /tmp/ccvAhnHZ.o: in function `main':
+/usr/bin/ld: /tmp/cciVbspO.o: in function `main':
 conftest.c:(.text+0xe): undefined reference to `_doprnt'
 collect2: error: ld returned 1 exit status
 configure:4676: $? = 1
@@ -673,7 +673,7 @@ configure:4690: $? = 0
 configure:4690: result: yes
 configure:4690: checking for pthread_delay_np
 configure:4690: gcc -o conftest -O0   conftest.c -lm  >&5
-/usr/bin/ld: /tmp/ccH1yf0N.o: in function `main':
+/usr/bin/ld: /tmp/ccnezPSy.o: in function `main':
 conftest.c:(.text+0xe): undefined reference to `pthread_delay_np'
 collect2: error: ld returned 1 exit status
 configure:4690: $? = 1
@@ -802,6 +802,7 @@ config.status:841: creating src/Makefile
 config.status:841: creating test/Makefile
 config.status:841: creating doc/stoical.1
 config.status:841: creating config.h
+config.status:1016: config.h is unchanged
 configure:5976: result: 
 configure:5978: result: ----{ STOICAL 0.1.9
 configure:5980: result: CFLAGS	: -O0
