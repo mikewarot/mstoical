@@ -1,3 +1,8 @@
+2020-10-06 Michael Warot <chezmike@gmail.com>
+	* everything :  compiles, but crashes on startup, which is progress for me
+
+	* configure.as: updated version to 0.1.9, now understand what autoconf does a bit
+
 2002-05-06 Jonathan M. Liles <wantingwaiting@users.sf.net>
 
 	* util/genvim: added syntax folding.

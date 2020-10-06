@@ -3,14 +3,14 @@
 #
 # See src/config.h for build options.
 
-VERS= 0.1.8
+VERS= 0.1.9
 META= Makefile
 OBJS= kernel.o term.o mem.o hash.o dict.o debug.o string.o signal.o
 SRCS= kernel.c term.c dict.c string.c hash.c debug.c mem.c signal.c
 PREFIX= /usr/local
 NAME = stoical-$(VERS)
 LIBROOT= $(PREFIX)/lib/stoical
-CFLAGS= -c -DVERSION=\"$(VERS)\" -DLIBROOT=\"$(LIBROOT)\" -Wall -w -O0
+CFLAGS= -c -DVERSION=\"$(VERS)\" -DLIBROOT=\"$(LIBROOT)\" -Wall -O0
 LIBS= -lm 
 
 all: src/.depend 
