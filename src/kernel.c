@@ -126,12 +126,12 @@ struct voc_entry radix	  =	{ type: A_CONST, parm:
 				{ type: T_FLT, v: { f: 10 } } };
 struct iopoint *io;
 
-// #ifdef REGEX
+#ifdef REGEX
 /* maximum number of sub matches for regexps */
 struct voc_entry hashmatch =	{ type: A_CONST, parm:
 				{ type: T_FLT, v: { f: 10 } } };
 long re_flags = 0;
-// #endif
+#endif
 
 finput = tinput	= stdin;
 toutput	= stdout;

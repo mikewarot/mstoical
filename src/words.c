@@ -2021,9 +2021,11 @@ begin(hash_a)
 
 	fpush(sst,( i > 10 ? i + 48 + 7 : i + 48));
 end()
+#ifdef REGEX
 begin(hashmatch)
 	rpush(sst,&hashmatch);
 end()
+#endif
 /**(system) args[
  * 
  * Array containing the command line arguments passed by the shell. 
