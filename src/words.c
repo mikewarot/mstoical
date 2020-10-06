@@ -3554,8 +3554,7 @@ end()
  */
 begin(_else)
     ip++;
-	ip += (long int) *ip;
-	ip--;
+	ip = (void*) ((long int) ip + (long int) *ip);
 end()
 /**(conditional) (if)
  * Tests TOS. If zero, the instruction pointer is incremented. Otherwise,
