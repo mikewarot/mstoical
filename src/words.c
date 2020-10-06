@@ -3553,7 +3553,9 @@ end()
  * value in the instruction steam.
  */
 begin(_else)
-	ip += (ub4)*(ip + 1);
+    ip++;
+	ip += (long int) *ip;
+	ip--;
 end()
 /**(conditional) (if)
  * Tests TOS. If zero, the instruction pointer is incremented. Otherwise,
