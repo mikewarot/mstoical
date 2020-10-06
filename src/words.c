@@ -3557,8 +3557,10 @@ end()
  * value in the instruction steam.
  */
 begin(_else)
+    printk("(else) - before ip = %p",ip);
     ip++;
 	ip = (void*) ((long int) ip + (long int) *ip);
+    printk("(else) -  after ip = %p",ip);
 end()
 /**(conditional) (if)
  * Tests TOS. If zero, the instruction pointer is incremented. Otherwise,
@@ -3566,8 +3568,15 @@ end()
  * instruction stream.
  */  
 begin(_if)
-	if ( fpop(sst) != FALSE )
+  int delta;
+  delta = fpop(sst);
+  printk("in _if  delta = %i, ip=%p",delta,ip);
+	if ( delta != 0 )
+	{
 		ip++;
+		ip++;
+		printk("ip = %p",ip);
+	}
 	else
 		/* Doesn't return! */
 		exec(*adr(_else));

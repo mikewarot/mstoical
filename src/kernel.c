@@ -210,7 +210,7 @@ if ( data->main )
 			l = strlen( argv[ i ] );
 			
 			a[i].type	= T_STR;
-			a[i].v.s	= malloc( sizeof(string) + l + 1 );
+			a[i].v.s	= malloc( sizeof(string) + l + 2 );
 			
 			a[i].v.s->l = l;
 
@@ -234,10 +234,18 @@ if ( data->main )
 	stoical = voc; 
 	
 	printk("Building STOICAL vocabulary...");
+    printk("voc = %p",voc);
 
 	i = 0;
 	while ( builtins[i].code != NULL ) 
+	{
+		printk("appending word %s  %p",builtins[i].name,builtins[i].code);
 		voc_append(voc, &builtins[i++], 0);
+	}
+    printk("voc = %p",voc);
+	
+	printk("%i words appended\n",i);
+	printk("vst = %p, voc = %p\n",vst,voc);
 
 	push(vst,voc);
 
@@ -286,12 +294,12 @@ if ( data->main )
 
 	push(cst,stt_lookup("eoc"));
 	push(cst,stt_lookup("(if)"));
-	push(cst,(void*)7);
+	push(cst,(void*)(7*8));
 	
 	push(cst,stt_lookup("check"));
 	push(cst,stt_lookup("eqz"));
 	push(cst,stt_lookup("(if)"));
-	push(cst,(void*)3);
+	push(cst,(void*)(3*8));
 
 	push(cst,stt_lookup("execc"));
 	push(cst,stt_lookup("clearcst"));
@@ -299,15 +307,19 @@ if ( data->main )
 	push(cst,stt_lookup("prompt"));
 	push(cst,stt_lookup("rdline"));
 	push(cst,stt_lookup("(else)"));
-	push(cst,(void*)-13);
+	push(cst,(void*)(-13*8));
 
 
 	
 	printk("Initializing USER vocabulary...");
+    printk("Current = %p",current);
+	printk("vst = %p",vst);
 	
 	current = peek(vst);
+    printk("Current = %p",current);
 
 	printk("Stage one complete...");
+	printk("current = %i\n",current);
 	
 }
 else
@@ -322,18 +334,25 @@ else
 
 count = cst - cstmin;
 cst = cstmin;
-
+  printk("count = %i, cst = %i",count,cst);
+  
 /* set the default clause handler */
-clause = adr(_left_brace);
+clause = adr(_left_brace);							printk("335");
 
-item.type = A_CMP;
-item.name = "kernel";
-item.code = adr(_colon);
+item.type = A_CMP;									printk("337");
+item.name = "kernel";								printk("338");
+item.code = adr(_colon);							printk("330");
 
+
+  printk("Current = %p",current);
 entry =	voc_append( current, &item, (count * sizeof(void *)) + 1 );
+
+  printk("Entry = %p",entry);
 
 if ( data->main )
 	current = peek(vst);
+
+  printk(" memcpy(%p,%p,%i)",&entry->parm, cst, (count * sizeof(void *)) );
 
 memcpy( &entry->parm, cst, (count * sizeof(void *)) );
 
