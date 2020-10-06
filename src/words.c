@@ -1837,7 +1837,8 @@ end()
  */
 begin(accept)
 	struct sockaddr_in sin;
-	int s, len;
+	int s;
+	unsigned len;
 	t_sock *nsock;
 	t_sock *sock;
 
@@ -1925,7 +1926,11 @@ end()
  */
 begin(shutdown)
 	/* FIXME: When should I close this stream? */
-	shutdown(((t_file *)ppop(sst))->fd, fpop(sst));
+	int socket, how;
+	socket = ((t_file *)ppop(sst))->fd;
+	how = fpop(sst);
+	shutdown(socket, how);
+	// ((t_file *)ppop(sst))->fd, fpop(sst));
 end()
 #ifdef HAVE_SYS_SENDFILE_H
 /**(io) sendfile - (new)

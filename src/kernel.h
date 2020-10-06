@@ -147,8 +147,8 @@ typedef struct {
 /* Stack manipulation macros */
 /* drop is similary to pop, except that it returns no value */
 #define drop(s) (--s)
-#define pop(s) (*(--s))
-#define push(s,v) (*(s++) =v)
+#define pop(s) ((s--,*s))
+#define push(s,v) ((s++,*s=v))
 #define peek(s) (*(s - 1))
 #define idx(s,n) (*(s - (n + 1)))
 #define swap(s) ({ \
@@ -160,28 +160,28 @@ typedef struct {
 		}) 
 
 /* Macros to manipulte just the values on a stack of type/value pairs */
-#define cpop(s) ((--s)->v)
-#define ctpush(s,k,t) (*(s++) = (cell){ t, (value)k })
+#define cpop(s) ((s--,s)->v)
+#define ctpush(s,k,t) (*(s++,s) = (cell){ t, (value)k })
 
-#define cmark(s) (*(s++) = (cell){ T_MARK, { 0 } })
+#define cmark(s) (*(s++,s) = (cell){ T_MARK, { 0 } })
 #define cismark(s,n) ( (s - (n + 1))->type == T_MARK )
 
 /* Type specific stack operations. These are only for stacks
  * of cell's. (sstack and lstack) */
-#define spush(st,k) (*(st++) = (cell){ T_STR, { s: k }})
-#define fpush(st,k) (*(st++) = (cell){ T_FLT, { f: k }})
-#define ppush(st,k) (*(st++) = (cell){ T_PTR, { p: k }})
-#define rpush(st,k) (*(st++) = (cell){ T_REF, { p: k }})
-#define filpush(st,k) (*(st++) = (cell){ T_FIL, { p: k }})
+#define spush(st,k) (*(st++,st) = (cell){ T_STR, { s: k }})
+#define fpush(st,k) (*(st++,st) = (cell){ T_FLT, { f: k }})
+#define ppush(st,k) (*(st++,st) = (cell){ T_PTR, { p: k }})
+#define rpush(st,k) (*(st++,st) = (cell){ T_REF, { p: k }})
+#define filpush(st,k) (*(st++,st) = (cell){ T_FIL, { p: k }})
 
 
-#define scpop(st) ( &((--st)->v.s->s) )
+#define scpop(st) ( &((st--,st)->v.s->s) )
 
-#define filpop(s) ((--s)->v.p)
-#define ppop(s) ((--s)->v.p)
-#define rpop(s) ((--s)->v.p)
-#define fpop(s) ((--s)->v.f)
-#define spop(st) ((--st)->v.s)
+#define filpop(s) ((s--,s->v.p))
+#define ppop(s) ((s--,s->v.p))
+#define rpop(s) ((s--,s->v.p))
+#define fpop(s) ((s--,s->v.f))
+#define spop(st) ((st--,st->v.s))
 
 #define begin(name)	s_ ## name: {
 #define end()		goto *adr(next); }
