@@ -397,7 +397,7 @@ int main (int argc, char **argv)
 	data->main	= 1;
 	data->io	= malloc( sizeof( struct iopoint ));
 	
-	srand((ub4)&data);	/* just a lame seed for rand */
+	srand((unsigned) (unsigned long) &data);	/* just a lame seed for rand */
 
 #ifdef THREADS
 	/* Initialize TSD key ) */
