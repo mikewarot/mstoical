@@ -284,22 +284,26 @@ if ( data->main )
 	
 	printk("Bootstrapping interactive compiler...");
 
-	strcpy(&tib->s, "(:) 'def include" );
-
+//	strcpy(&tib->s, "(:) 'def include" );
+	strcpy(&tib->s, "bye " );
+	
 	tib->l = strlen(&tib->s);
 	tibp = 0;
 	eol = FALSE; eoc = TRUE;
+	
+	printk("tib --> %s",&tib->s);  // show the buffer
+	printk("initial cst: %p, cstmin: %p",cst,cstmin);
 
 	push(cst,stt_lookup("compile"));
 
 	push(cst,stt_lookup("eoc"));
 	push(cst,stt_lookup("(if)"));
-	push(cst,(void*)(7*8));
+	push(cst,(void*)(6));
 	
 	push(cst,stt_lookup("check"));
 	push(cst,stt_lookup("eqz"));
 	push(cst,stt_lookup("(if)"));
-	push(cst,(void*)(3*8));
+	push(cst,(void*)(3));
 
 	push(cst,stt_lookup("execc"));
 	push(cst,stt_lookup("clearcst"));
@@ -307,7 +311,7 @@ if ( data->main )
 	push(cst,stt_lookup("prompt"));
 	push(cst,stt_lookup("rdline"));
 	push(cst,stt_lookup("(else)"));
-	push(cst,(void*)(-13*8));
+	push(cst,(void*)(-13));
 
 
 	
@@ -331,30 +335,32 @@ else
 	/* make sure that our collectable items on our new stack are marked */
 	stack_mark( sstmin, sst, gstack, &gst );
 }
-
+long int bytecount;
 count = cst - cstmin;
+bytecount = (long int) cst - (long int) cstmin;
 cst = cstmin;
-  printk("count = %i, cst = %i",count,cst);
+  printk("count = %i, cst = %p",count,cst);
+  printk("bytecount = %li",bytecount);
   
 /* set the default clause handler */
-clause = adr(_left_brace);							printk("335");
+clause = adr(_left_brace);							
 
-item.type = A_CMP;									printk("337");
-item.name = "kernel";								printk("338");
-item.code = adr(_colon);							printk("330");
+item.type = A_CMP;								
+item.name = "kernel";							
+item.code = adr(_colon);					
 
 
   printk("Current = %p",current);
-entry =	voc_append( current, &item, (count * sizeof(void *)) + 1 );
+entry =	voc_append( current, &item, bytecount );
 
   printk("Entry = %p",entry);
-
+	
 if ( data->main )
 	current = peek(vst);
 
-  printk(" memcpy(%p,%p,%i)",&entry->parm, cst, (count * sizeof(void *)) );
+  printk(" memcpy(%p,%p,%i)",&entry->parm, cst, bytecount );
 
-memcpy( &entry->parm, cst, (count * sizeof(void *)) );
+memcpy( &entry->parm, cst, bytecount );
 
 printk("Outer loop has been compiled (%i words). Executing...\n", count );
 

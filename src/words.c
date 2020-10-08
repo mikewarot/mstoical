@@ -222,6 +222,8 @@ begin(dispatch)
 	type_head *head;
 	type_vec *tvec, *vec;
 	ub4 i, type = 0;
+	
+	printk("Dispatch"); // get a clue as to where we are
 
 	/* the parameter field of a typechecked word looks like :
 	 *
@@ -2381,6 +2383,14 @@ end()
 begin(bye)
 	exec(*adr(rtn));
 end()
+/**(compiler) adios
+ * Exit the entire process. (with return value of zero);
+ */
+begin(adios)
+    printk("Adios, Amigos!");
+	exec(*adr(rtn));
+end()
+
 /**(error) abort
  * Reset compiler to a sane state, and return control to the keyboard.
  */
@@ -2411,6 +2421,7 @@ end()
  */ 
 begin(_colon) 
 	printk("(:)");
+	printk(" push(rst,((rcell){ self:%p, ip:%p}));",self,ip);
 
 	/* save IP on the return stack */
 	push(rst,((rcell){ self, ip }));
@@ -2750,14 +2761,14 @@ end()
  */
 begin(_semicolon) 
 	printk("(;)");
-
 	ip = pop(rst).i;
+	printk("ip:%p",ip);  
 end()
 #define word() (fpush(sst,(eol = st_word( tib, &tibp, pad ))))
 /**(string) word
  * Scan keyboard buffer for the next word. Skip leading white space.
- * Treat Everything between quotes as a single word. Set eol to true if the
- * end of line was reached while scanning.
+ * Treat Everything between quotes as a single word. 
+ * Set eol to true if the end of line was reached while scanning.
  */
 begin(word)
 	word();
@@ -2791,14 +2802,20 @@ end()
  * and skip to the intruction following it. */
 begin(l_)
 	cell *a;
+	printk("l() - *ip:%p",ip);
+	printk("ip = %p",ip);
+	printk("**ip --> %s",(*ip)->name);
 
 	ip++;
 	a = (cell*)ip;
 	
-	(cell*)ip++;
-	ip--;
+	ip++;
 
+    printk("push(sst,*a);  a:%p, *a:%p",a,*a);
 	push(sst,*a);
+	
+	printk("ip = %p",ip);
+	printk("**ip --> %s",(*ip)->name);
 end()
 #ifdef REGEX
 /**(regex) x - (*) (new)
@@ -3122,6 +3139,8 @@ begin(next)
 	if ( *ip == NULL )
 		error("null instruction! forgot to add it to the vocabulary?\n");
 #endif
+    printk("Next - *ip --> %p",*ip);
+	printk("      **ip --> %s",(*ip)->name);
 	execute(*ip);
 end()
 /**(dictionary) (constant)
@@ -3557,9 +3576,11 @@ end()
  * value in the instruction steam.
  */
 begin(_else)
-    printk("(else) - before ip = %p",ip);
+    long int delta;
     ip++;
-	ip = (void*) ((long int) ip + (long int) *ip);
+	delta = (long int) *ip;
+    printk("(else) %li",delta);
+	ip += delta-1;
     printk("(else) -  after ip = %p",ip);
 end()
 /**(conditional) (if)
@@ -3568,18 +3589,19 @@ end()
  * instruction stream.
  */  
 begin(_if)
-  int delta;
-  delta = fpop(sst);
-  printk("in _if  delta = %i, ip=%p",delta,ip);
-	if ( delta != 0 )
-	{
-		ip++;
-		ip++;
-		printk("ip = %p",ip);
-	}
-	else
-		/* Doesn't return! */
-		exec(*adr(_else));
+  long int delta;
+  float flagv;
+  
+  ip++;
+  delta = (long int) *ip;   // value under the current IP is a delta
+  flagv = fpop(sst);
+  
+  printk("(if) branch if NOT zero - flagv = %f   delta = %li",flagv,delta);
+  if ( delta != 0 )
+	ip += delta-2;
+  else
+	ip++;
+//	exec(*adr(_else));  // doesn't return
 end()
 
 /**(iterative) ({do) 
@@ -3969,8 +3991,11 @@ begin(compile)
 		if ( pad->l < 1 )
 			break;
 		
+		printk("Word to look up --> >>%s<<",&pad->s);
 		if ( ( entry = stt_lookup( &pad->s ) ) != NULL )
 		{	
+	        printk("word found: %p",entry);
+			printk("      name: >>%s<<",entry->name);
 			/* Is a word */
 			if ( state || entry->type & A_IMM )
 			{
@@ -3986,7 +4011,8 @@ begin(compile)
 			}
 			else
 			{	
-				printk("\tword");
+				printk("Compiling word >>%s<<", entry->name);
+				printk("push(cst:%p,entry%p);",cst,entry);
 				push(cst,entry);
 			}
 		}
@@ -4136,12 +4162,24 @@ end()
  * Execute the contents of the compile stack.
  */
 begin(execc)
-//	push(rst,((rcell){ self, ip }));
+ 	push(rst,((rcell){ self, ip }));
 	push(rst,((rcell){ line, ip }));
 	push(cst,(stt_lookup("(;)")));
 	
 	line->size = cst - cstmin;
 
-	ip = (void *)cstmin;
+	ip = cstmin;
+	ip += 1;
+	
+	printk("tib --> %s",&tib->s);  // show the buffer
+	printk("initial cst: %p, cstmin: %p",cst,cstmin);
+	printk("ip = %p",ip);
+	printk("**ip --> %s",(*ip)->name);
+//	execute(*ip);
+    ip--;    // bug fix
+
+    exec(*adr(next));  // jump to the NEXT interpreter
+
+	
 end()
 

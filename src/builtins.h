@@ -43,6 +43,8 @@ struct voc_item builtins[] = {
 { A_WRD,"check",	adr(check) },
 { A_WRD,"rtn",	adr(rtn) },
 { A_WRD,"bye",	adr(bye) },
+{ A_WRD,"adios",	adr(adios) },
+
 { A_WRD,"undefined0",adr(undefined) },
 
 { A_WRD,"mkdir",	adr(mkdir) },
