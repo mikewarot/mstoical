@@ -2808,9 +2808,8 @@ begin(l_)
 
 	ip++;
 	a = (cell*)ip;
-	
 	ip++;
-
+	
     printk("push(sst,*a);  a:%p, *a:%p",a,*a);
 	push(sst,*a);
 	
@@ -3125,7 +3124,39 @@ end()
  * floating point literal then leave its value at TOS-1 and TRUE at TOS.
  * Otherwise discard the string and leave FALSE at TOS. */
 begin(iliteral)
-	st_iliteral();
+	float v; 
+	char *s; 
+	char *xxend; 
+ 
+	xxend = s = scpop(sst); 
+	v = strtol( s, &xxend, radix.parm.v.f ); 
+	if ( xxend != s ) 
+	{ 
+		if ( *xxend == '.' ) 
+		{
+			/* Looks like a float. 
+			 * FIXME: Too bad we can only 
+			 * read floats in base 10. */ 
+			v = strtof( s, &xxend ); 
+ 
+			if ( *xxend == '\0' ) 
+			{ 
+				fpush(sst,v); 
+				fpush(sst,TRUE); 
+			} 
+			else 
+				fpush(sst,FALSE); 
+		} 
+		else if ( *xxend == '\0' ) 
+		{ 
+			fpush(sst,v); 
+			fpush(sst,TRUE); 
+		} 
+		else 
+			fpush(sst,FALSE); 
+	} 
+	else 
+		fpush(sst,FALSE); 
 end()
 begin(next)
 	/* check stack bounds */
@@ -4075,13 +4106,25 @@ begin(compile)
 #endif
 		else
 		{
+			printk("Compiling numeric literal >>%s<<",&pad->s);
 			spush(sst,pad);
 			st_iliteral();
 			
-			if ( fpop(sst) != FALSE )
-				st_lit();	
-			else
+			cell xxx;
+			long int yyy;
+			
+			if ( fpop(sst) != FALSE ) {
+				printk("new and improved st_lit()");
+				push(cst,(stt_lookup("l()")));
+				xxx = pop(sst);  // pointer to a cell
+				yyy = xxx.v.f;
+				push(cst,yyy);
+				printk("Pushed %li",yyy);
+			}				
+			else {
+				printk("exec(*undefined));");
 				exec(*adr(undefined));
+			}
 		}
 	}
 
