@@ -2801,20 +2801,25 @@ end()
  * Push the literal following us in the intruction stream onto the stack,
  * and skip to the intruction following it. */
 begin(l_)
-	cell *a;
+	cell a;
 	printk("l() - *ip:%p",ip);
 	printk("ip = %p",ip);
 	printk("**ip --> %s",(*ip)->name);
 
-	ip++;
-	a = (cell*)ip;
+    ip++;
+	a.v.f = (long int) *ip;
+	a.type = T_FLT;
 	ip++;
 	
-    printk("push(sst,*a);  a:%p, *a:%p",a,*a);
-	push(sst,*a);
+	printk("Sizeof cell:%i",sizeof(cell));
+	printk("Sizeof *ip:%i",sizeof(*ip));
 	
-	printk("ip = %p",ip);
+    printk("push(sst,a);  sst:%p, *a:%f",sst,a.v.f);
+	push(sst,a);
+	
+	printk("*ip = %p",*ip);
 	printk("**ip --> %s",(*ip)->name);
+	ip--;  // undo the peek ahead
 end()
 #ifdef REGEX
 /**(regex) x - (*) (new)
