@@ -2803,13 +2803,14 @@ end()
 begin(l_)
 	cell a;
 	printk("l() - *ip:%p",ip);
-	printk("ip = %p",ip);
 	printk("**ip --> %s",(*ip)->name);
 
     ip++;
-	a.v.f = (long int) *ip;
+//	a.v.f = (long int) *ip;
+    a.v.p = *ip;
 	a.type = T_FLT;
 	ip++;
+
 	
 	printk("Sizeof cell:%i",sizeof(cell));
 	printk("Sizeof *ip:%i",sizeof(*ip));
@@ -4117,13 +4118,15 @@ begin(compile)
 			
 			cell xxx;
 			long int yyy;
+			void *zzz;
 			
 			if ( fpop(sst) != FALSE ) {
 				printk("new and improved st_lit()");
 				push(cst,(stt_lookup("l()")));
 				xxx = pop(sst);  // pointer to a cell
 				yyy = xxx.v.f;
-				push(cst,yyy);
+				zzz = xxx.v.p;
+				push(cst,zzz);
 				printk("Pushed %li",yyy);
 			}				
 			else {
