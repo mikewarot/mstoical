@@ -2,7 +2,8 @@
 cmake_minimum_required(VERSION 3.17)
 
 project(STOICAL VERSION 0.1.9 LANGUAGES C)
-# this code looks quite old, let's not set a C standard version for now
+# from looking at the code, this project was probably written in ANSI C, with GNU extensions and some C99 features
+set(CMAKE_C_STANDARD 99)
 
 # BEGIN macros
 # escape version string for ease of setting string as macro
@@ -29,10 +30,11 @@ include(CheckSymbolExists)
 include(CheckTypeSize)
 
 # BEGIN configure variables for config.h
-set(DEBUG ON) # TODO: set from CMAKE_BUILD_TYPE == Debug
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(DEBUG ON)
+endif()
 set(HAVE_LIBPTHREAD ${Threads_FOUND})
 set(HAVE_LIBREADLINE ${Readline_FOUND})
-# XXX: HAVE_LIBTERMCAP
 set(HAVE_LIBTERMCAP ${Termcap_FOUND})
 # header file checks
 check_symbol_exists(regcomp regex.h HAVE_REGCOMP)

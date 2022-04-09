@@ -4,6 +4,7 @@ target_compile_definitions(
     -DVERSION=${STOICAL_ESCAPED_VERSION_STRING}
     -DLIBROOT=${STOICAL_ESCAPED_LIBROOT_STRING}
 )
+target_compile_options(stoical PRIVATE -Wall)
 
 if(Threads_FOUND)
     target_link_libraries(stoical PRIVATE Threads::Threads)
