@@ -10,8 +10,8 @@ SRCS= kernel.c term.c dict.c string.c hash.c debug.c mem.c signal.c
 PREFIX= /usr/local
 NAME = stoical-$(VERS)
 LIBROOT= $(PREFIX)/lib/stoical
-CFLAGS= -c -DVERSION=\"$(VERS)\" -DLIBROOT=\"$(LIBROOT)\" -g -O2 -std=gnu99
-LIBS= -lm 
+CFLAGS= -c -DVERSION=\"$(VERS)\" -DLIBROOT=\"$(LIBROOT)\" -Wall -g -O2
+LIBS= -lm -lpthread 
 
 all: src/.depend 
 	cd src && $(MAKE)

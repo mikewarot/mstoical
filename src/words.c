@@ -2009,8 +2009,7 @@ end()
 begin(hash_put)
 	/* Place character represented by the value at TOS into
 	 * the buffer. Decrement the pointer, and increment the count. */
-        hash_ptr.parm.v.p += sizeof(char*);
-	*((char*)hash_ptr.parm.v.p) = fpop(sst);
+	*(--(char*)hash_ptr.parm.v.p) = fpop(sst);
 	
 	hash_cnt.parm.v.f++;
 end()
@@ -2790,8 +2789,7 @@ begin(l_)
 	ip++;
 	a = (cell*)ip;
 	
-	ip+= sizeof(cell*);
-
+	((cell*)ip)++;
 	ip--;
 
 	push(sst,*a);
