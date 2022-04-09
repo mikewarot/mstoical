@@ -1,6 +1,5 @@
-const char help[] = "S t o i c a l version: %s \n\
+const char help[] = "S t o i c a l  %s \n\
 Copyright (c) 2002 Jonathan Moore Liles.\n\
-Copyright (c) 2020 Michael Warot\n\
 Released under the GNU General Public License (see COPYING)\n\
 \n\
 usage:\n\

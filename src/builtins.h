@@ -43,8 +43,6 @@ struct voc_item builtins[] = {
 { A_WRD,"check",	adr(check) },
 { A_WRD,"rtn",	adr(rtn) },
 { A_WRD,"bye",	adr(bye) },
-{ A_WRD,"adios",	adr(adios) },
-
 { A_WRD,"undefined0",adr(undefined) },
 
 { A_WRD,"mkdir",	adr(mkdir) },
@@ -97,9 +95,7 @@ struct voc_item builtins[] = {
 { A_WRD,"bool",	adr(bool) },
 { A_WRD,"iliteral",adr(iliteral) },
 { A_WRD,"radix",	adr(radix) },
-#ifdef REGEX
-{ A_WRD,"#match",	adr(hashmatch) },
-#endif
+{ A_WRD,"#match",	adr(hash_match) },
 { A_WRD,"args[",	adr(args_bracket) },
 { A_WRD,"load",	adr(load) },
 { A_WRD,"include",adr(include) },

@@ -200,6 +200,5 @@ int st_word( string *tib, int *tibp, string *pad )
 	}
 	pad->l = --len;
 	(&pad->s)[len] = '\0';
-	printk("WORD = >>%s<<",&pad->s);  // print the word found on the console
 	return eol;
 }
