@@ -1,0 +1,59 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  continuous-integration:
+    runs-on: ${{ matrix.os }}
+    env:
+      BUILD_TYPE: Debug
+    strategy:
+      fail-fast: false
+      matrix:
+        # specify a specific compiler to build with each OS separately
+        include:
+          - platform_name: linux
+            os: ubuntu-20.04
+            cc: gcc-10
+            cmake_generator: "Unix Makefiles"
+          - platform_name: macos
+            os: macos-10.15
+            cc: clang
+            cmake_generator: "Unix Makefiles"
+          # NOTE: CC seems to be ignored on Windows, but specify it anyway for consistency
+          - platform_name: windows
+            os: windows-2019
+            cc: msvc
+            cmake_generator: ""
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure CMake
+        env:
+          CC: ${{ matrix.cc }}
+        # Use a bash shell so we can use the same syntax for environment variable
+        # access regardless of the host operating system
+        shell: bash
+        working-directory: ${{github.workspace}}/build
+        # Note the current convention is to use the -S and -B options here to specify source 
+        # and build directories, but this is only available with CMake 3.13 and higher.  
+        # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX:PATH=$GITHUB_WORKSPACE/test_install
+
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        # Execute the build.  You can specify a specific target with "--target <NAME>"
+        run: cmake --build . --config $BUILD_TYPE
+
+      # - name: Test Install
+      #   working-directory: ${{github.workspace}}/build
+      #   shell: bash
+      #   # Test install with CMake to the "test_install" directory
+      #   run: cmake --install . --config $BUILD_TYPE
