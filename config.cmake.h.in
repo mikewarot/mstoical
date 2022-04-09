@@ -1,4 +1,4 @@
-/* config.h.  Generated from config.h.in by CMake.  */
+/* config.cmake.h.in  Adapted from original config.h.in autotools header, this header now builds with CMake  */
 
 /* Print verbose debugging info */
 #cmakedefine DEBUG
