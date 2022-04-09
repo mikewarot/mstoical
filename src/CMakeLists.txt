@@ -10,9 +10,11 @@ if(Threads_FOUND)
 endif()
 
 if(Readline_FOUND)
-    target_link_libraries(stoical PRIVATE Readline)
+    target_include_directories(stoical PRIVATE ${Readline_INCLUDE_DIR})
+    target_link_libraries(stoical PRIVATE ${Readline_LIBRARY})
 endif()
 
 if(Termcap_FOUND)
-    target_link_libraries(stoical PRIVATE Termcap)
+    target_include_directories(stoical PRIVATE ${TERMCAP_INCLUDE_DIR})
+    target_link_libraries(stoical PRIVATE ${TERMCAP_LIBRARY})
 endif()
