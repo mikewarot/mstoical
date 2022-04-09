@@ -27,11 +27,12 @@ hostinfo               = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
+PATH: /usr/local/sbin
 PATH: /usr/local/bin
+PATH: /usr/sbin
 PATH: /usr/bin
+PATH: /sbin
 PATH: /bin
-PATH: /usr/local/games
-PATH: /usr/games
 
 
 ## ----------- ##
@@ -643,8 +644,8 @@ configure:6297: $? = 0
 configure:6307: result: yes
 configure:6314: checking for _doprnt
 configure:6357: gcc -o conftest -g -O2   conftest.c -lm  >&5
-/usr/bin/ld: /tmp/ccywXyBm.o: in function `main':
-/home/mike/stoical-0.1.8/configure:6347: undefined reference to `_doprnt'
+/usr/bin/ld: /tmp/cc3hg5aZ.o: in function `main':
+/stoical/stoical/configure:6347: undefined reference to `_doprnt'
 collect2: error: ld returned 1 exit status
 configure:6360: $? = 1
 configure: failed program was:
@@ -754,8 +755,8 @@ configure:6457: $? = 0
 configure:6467: result: yes
 configure:6405: checking for pthread_delay_np
 configure:6448: gcc -o conftest -g -O2   conftest.c -lm  >&5
-/usr/bin/ld: /tmp/ccsnZ4yO.o: in function `main':
-/home/mike/stoical-0.1.8/configure:6438: undefined reference to `pthread_delay_np'
+/usr/bin/ld: /tmp/cc96XPsp.o: in function `main':
+/stoical/stoical/configure:6438: undefined reference to `pthread_delay_np'
 collect2: error: ld returned 1 exit status
 configure:6451: $? = 1
 configure: failed program was:
