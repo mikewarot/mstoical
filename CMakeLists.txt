@@ -41,6 +41,7 @@ check_include_files(sys/sendfile.h HAVE_SYS_SENDFILE_H)
 set(PACKAGE_BUGREPORT "https://github.com/saxbophone")
 set(PACKAGE_NAME "STOICAL")
 set(PACKAGE_STRING "STOICAL ${STOICAL_VERSION_STRING}")
+set(PACKAGE_TARNAME "stoical")
 set(PACKAGE_VERSION ${STOICAL_VERSION_STRING})
 # debug stuff
 set(PROFILE ON)
