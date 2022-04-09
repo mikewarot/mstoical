@@ -15,16 +15,26 @@ set(STOICAL_ESCAPED_VERSION_STRING "\"${STOICAL_VERSION_STRING}\"")
 set(STOICAL_ESCAPED_LIBROOT_STRING "\"/usr/local/lib/stoical\"")
 # END macros
 
+# add custom dependencies directory
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+
+# dependency checks
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads)
+find_package(Readline)
+find_package(Termcap)
+
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
 include(CheckTypeSize)
 
 # BEGIN configure variables for config.h
 set(DEBUG ON) # TODO: set from CMAKE_BUILD_TYPE == Debug
-# header file checks
-# XXX: HAVE_LIBPTHREAD
-# XXX: HAVE_LIBREADLINE
+set(HAVE_LIBPTHREAD ${Threads_FOUND})
+set(HAVE_LIBREADLINE ${Readline_FOUND})
 # XXX: HAVE_LIBTERMCAP
+set(HAVE_LIBTERMCAP ${Termcap_FOUND})
+# header file checks
 check_symbol_exists(regcomp regex.h HAVE_REGCOMP)
 check_include_files(sys/sendfile.h HAVE_SYS_SENDFILE_H)
 # package stats

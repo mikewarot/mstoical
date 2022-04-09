@@ -4,3 +4,15 @@ target_compile_definitions(
     -DVERSION=${STOICAL_ESCAPED_VERSION_STRING}
     -DLIBROOT=${STOICAL_ESCAPED_LIBROOT_STRING}
 )
+
+if(Threads_FOUND)
+    target_link_libraries(stoical PRIVATE Threads::Threads)
+endif()
+
+if(Readline_FOUND)
+    target_link_libraries(stoical PRIVATE Readline)
+endif()
+
+if(Termcap_FOUND)
+    target_link_libraries(stoical PRIVATE Termcap)
+endif()
