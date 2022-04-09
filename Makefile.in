@@ -10,7 +10,7 @@ SRCS= kernel.c term.c dict.c string.c hash.c debug.c mem.c signal.c
 PREFIX= @prefix@
 NAME = stoical-$(VERS)
 LIBROOT= $(PREFIX)/lib/stoical
-CFLAGS= -c -DVERSION=\"$(VERS)\" -DLIBROOT=\"$(LIBROOT)\" -Wall @CFLAGS@
+CFLAGS= -c -DVERSION=\"$(VERS)\" -DLIBROOT=\"$(LIBROOT)\" @CFLAGS@ -std=gnu99
 LIBS= @LIBS@
 
 all: src/.depend 

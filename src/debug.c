@@ -140,6 +140,7 @@ void st_pword ( struct voc_entry *entry, struct voc_entry **high )
 		{
 			p++;
 			st_pcell( ((cell*)p) );
+			p+= sizeof(cell*);
 			p--;
 		}
 		else if ( strcmp( (*p)->name, "r()" ) == 0 ||

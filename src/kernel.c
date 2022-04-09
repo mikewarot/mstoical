@@ -128,7 +128,7 @@ struct iopoint *io;
 
 #ifdef REGEX
 /* maximum number of sub matches for regexps */
-struct voc_entry hashmatch =	{ type: A_CONST, parm:
+struct voc_entry hash_match =	{ type: A_CONST, parm:
 				{ type: T_FLT, v: { f: 10 } } };
 long re_flags = 0;
 #endif
@@ -210,7 +210,7 @@ if ( data->main )
 			l = strlen( argv[ i ] );
 			
 			a[i].type	= T_STR;
-			a[i].v.s	= malloc( sizeof(string) + l + 2 );
+			a[i].v.s	= malloc( sizeof(string) + l + 1 );
 			
 			a[i].v.s->l = l;
 
@@ -234,18 +234,10 @@ if ( data->main )
 	stoical = voc; 
 	
 	printk("Building STOICAL vocabulary...");
-    printk("voc = %p",voc);
 
 	i = 0;
 	while ( builtins[i].code != NULL ) 
-	{
-		printk("appending word %s  %p",builtins[i].name,builtins[i].code);
 		voc_append(voc, &builtins[i++], 0);
-	}
-    printk("voc = %p",voc);
-	
-	printk("%i words appended\n",i);
-	printk("vst = %p, voc = %p\n",vst,voc);
 
 	push(vst,voc);
 
@@ -284,26 +276,22 @@ if ( data->main )
 	
 	printk("Bootstrapping interactive compiler...");
 
-//	strcpy(&tib->s, "(:) 'def include" );
-	strcpy(&tib->s, "bye " );
-	
+	strcpy(&tib->s, "(:) 'def include" );
+
 	tib->l = strlen(&tib->s);
 	tibp = 0;
 	eol = FALSE; eoc = TRUE;
-	
-	printk("tib --> %s",&tib->s);  // show the buffer
-	printk("initial cst: %p, cstmin: %p",cst,cstmin);
 
 	push(cst,stt_lookup("compile"));
 
 	push(cst,stt_lookup("eoc"));
 	push(cst,stt_lookup("(if)"));
-	push(cst,(void*)(6));
+	push(cst,(void*)7);
 	
 	push(cst,stt_lookup("check"));
 	push(cst,stt_lookup("eqz"));
 	push(cst,stt_lookup("(if)"));
-	push(cst,(void*)(3));
+	push(cst,(void*)3);
 
 	push(cst,stt_lookup("execc"));
 	push(cst,stt_lookup("clearcst"));
@@ -311,19 +299,15 @@ if ( data->main )
 	push(cst,stt_lookup("prompt"));
 	push(cst,stt_lookup("rdline"));
 	push(cst,stt_lookup("(else)"));
-	push(cst,(void*)(-13));
+	push(cst,(void*)-13);
 
 
 	
 	printk("Initializing USER vocabulary...");
-    printk("Current = %p",current);
-	printk("vst = %p",vst);
 	
 	current = peek(vst);
-    printk("Current = %p",current);
 
 	printk("Stage one complete...");
-	printk("current = %i\n",current);
 	
 }
 else
@@ -335,32 +319,23 @@ else
 	/* make sure that our collectable items on our new stack are marked */
 	stack_mark( sstmin, sst, gstack, &gst );
 }
-long int bytecount;
+
 count = cst - cstmin;
-bytecount = (long int) cst - (long int) cstmin;
 cst = cstmin;
-  printk("count = %i, cst = %p",count,cst);
-  printk("bytecount = %li",bytecount);
-  
+
 /* set the default clause handler */
-clause = adr(_left_brace);							
+clause = adr(_left_brace);
 
-item.type = A_CMP;								
-item.name = "kernel";							
-item.code = adr(_colon);					
+item.type = A_CMP;
+item.name = "kernel";
+item.code = adr(_colon);
 
+entry =	voc_append( current, &item, (count * sizeof(void *)) + 1 );
 
-  printk("Current = %p",current);
-entry =	voc_append( current, &item, bytecount );
-
-  printk("Entry = %p",entry);
-	
 if ( data->main )
 	current = peek(vst);
 
-  printk(" memcpy(%p,%p,%i)",&entry->parm, cst, bytecount );
-
-memcpy( &entry->parm, cst, bytecount );
+memcpy( &entry->parm, cst, (count * sizeof(void *)) );
 
 printk("Outer loop has been compiled (%i words). Executing...\n", count );
 
@@ -422,7 +397,7 @@ int main (int argc, char **argv)
 	data->main	= 1;
 	data->io	= malloc( sizeof( struct iopoint ));
 	
-	srand((unsigned) (unsigned long) &data);	/* just a lame seed for rand */
+	srand((ub4)&data);	/* just a lame seed for rand */
 
 #ifdef THREADS
 	/* Initialize TSD key ) */

@@ -222,8 +222,6 @@ begin(dispatch)
 	type_head *head;
 	type_vec *tvec, *vec;
 	ub4 i, type = 0;
-	
-	printk("Dispatch"); // get a clue as to where we are
 
 	/* the parameter field of a typechecked word looks like :
 	 *
@@ -1839,8 +1837,7 @@ end()
  */
 begin(accept)
 	struct sockaddr_in sin;
-	int s;
-	unsigned len;
+	int s, len;
 	t_sock *nsock;
 	t_sock *sock;
 
@@ -1928,11 +1925,7 @@ end()
  */
 begin(shutdown)
 	/* FIXME: When should I close this stream? */
-	int socket, how;
-	socket = ((t_file *)ppop(sst))->fd;
-	how = fpop(sst);
-	shutdown(socket, how);
-	// ((t_file *)ppop(sst))->fd, fpop(sst));
+	shutdown(((t_file *)ppop(sst))->fd, fpop(sst));
 end()
 #ifdef HAVE_SYS_SENDFILE_H
 /**(io) sendfile - (new)
@@ -2016,8 +2009,9 @@ end()
 begin(hash_put)
 	/* Place character represented by the value at TOS into
 	 * the buffer. Decrement the pointer, and increment the count. */
+        hash_ptr.parm.v.p += sizeof(char*);
 	*((char*)hash_ptr.parm.v.p) = fpop(sst);
-	hash_cnt.parm.v.p--;
+	
 	hash_cnt.parm.v.f++;
 end()
 begin(hash_a)
@@ -2028,11 +2022,9 @@ begin(hash_a)
 
 	fpush(sst,( i > 10 ? i + 48 + 7 : i + 48));
 end()
-#ifdef REGEX
-begin(hashmatch)
-	rpush(sst,&hashmatch);
+begin(hash_match)
+	rpush(sst,&hash_match);
 end()
-#endif
 /**(system) args[
  * 
  * Array containing the command line arguments passed by the shell. 
@@ -2339,8 +2331,9 @@ begin(vocab)
 	{
 	
 #ifdef PROFILE
-		printf("\'%-20s : size=%li, called=%i\n",  ornull(entry->name),
-							 entry->size * sizeof( ip ),
+		printf("\'%-20s : size=%i, called=%i\n",  ornull(entry->name),
+							 entry->size *
+							 sizeof( ip ),
 							 entry->called );
 #else
 		printf("\'%-20s :\n",  ornull(entry->name) );
@@ -2383,14 +2376,6 @@ end()
 begin(bye)
 	exec(*adr(rtn));
 end()
-/**(compiler) adios
- * Exit the entire process. (with return value of zero);
- */
-begin(adios)
-    printk("Adios, Amigos!");
-	exec(*adr(rtn));
-end()
-
 /**(error) abort
  * Reset compiler to a sane state, and return control to the keyboard.
  */
@@ -2421,7 +2406,6 @@ end()
  */ 
 begin(_colon) 
 	printk("(:)");
-	printk(" push(rst,((rcell){ self:%p, ip:%p}));",self,ip);
 
 	/* save IP on the return stack */
 	push(rst,((rcell){ self, ip }));
@@ -2761,14 +2745,14 @@ end()
  */
 begin(_semicolon) 
 	printk("(;)");
+
 	ip = pop(rst).i;
-	printk("ip:%p",ip);  
 end()
 #define word() (fpush(sst,(eol = st_word( tib, &tibp, pad ))))
 /**(string) word
  * Scan keyboard buffer for the next word. Skip leading white space.
- * Treat Everything between quotes as a single word. 
- * Set eol to true if the end of line was reached while scanning.
+ * Treat Everything between quotes as a single word. Set eol to true if the
+ * end of line was reached while scanning.
  */
 begin(word)
 	word();
@@ -2801,26 +2785,16 @@ end()
  * Push the literal following us in the intruction stream onto the stack,
  * and skip to the intruction following it. */
 begin(l_)
-	cell a;
-	printk("l() - *ip:%p",ip);
-	printk("**ip --> %s",(*ip)->name);
+	cell *a;
 
-    ip++;
-//	a.v.f = (long int) *ip;
-    a.v.p = *ip;
-	a.type = T_FLT;
 	ip++;
+	a = (cell*)ip;
+	
+	ip+= sizeof(cell*);
 
-	
-	printk("Sizeof cell:%i",sizeof(cell));
-	printk("Sizeof *ip:%i",sizeof(*ip));
-	
-    printk("push(sst,a);  sst:%p, *a:%f",sst,a.v.f);
-	push(sst,a);
-	
-	printk("*ip = %p",*ip);
-	printk("**ip --> %s",(*ip)->name);
-	ip--;  // undo the peek ahead
+	ip--;
+
+	push(sst,*a);
 end()
 #ifdef REGEX
 /**(regex) x - (*) (new)
@@ -3036,7 +3010,7 @@ end()
  */	
 begin(r_)
 	regex_t *reg;
-	int matches = hashmatch.parm.v.f;
+	int matches = hash_match.parm.v.f;
 	regmatch_t p[matches];
 	char *s;
 
@@ -3130,39 +3104,7 @@ end()
  * floating point literal then leave its value at TOS-1 and TRUE at TOS.
  * Otherwise discard the string and leave FALSE at TOS. */
 begin(iliteral)
-	float v; 
-	char *s; 
-	char *xxend; 
- 
-	xxend = s = scpop(sst); 
-	v = strtol( s, &xxend, radix.parm.v.f ); 
-	if ( xxend != s ) 
-	{ 
-		if ( *xxend == '.' ) 
-		{
-			/* Looks like a float. 
-			 * FIXME: Too bad we can only 
-			 * read floats in base 10. */ 
-			v = strtof( s, &xxend ); 
- 
-			if ( *xxend == '\0' ) 
-			{ 
-				fpush(sst,v); 
-				fpush(sst,TRUE); 
-			} 
-			else 
-				fpush(sst,FALSE); 
-		} 
-		else if ( *xxend == '\0' ) 
-		{ 
-			fpush(sst,v); 
-			fpush(sst,TRUE); 
-		} 
-		else 
-			fpush(sst,FALSE); 
-	} 
-	else 
-		fpush(sst,FALSE); 
+	st_iliteral();
 end()
 begin(next)
 	/* check stack bounds */
@@ -3176,8 +3118,6 @@ begin(next)
 	if ( *ip == NULL )
 		error("null instruction! forgot to add it to the vocabulary?\n");
 #endif
-    printk("Next - *ip --> %p",*ip);
-	printk("      **ip --> %s",(*ip)->name);
 	execute(*ip);
 end()
 /**(dictionary) (constant)
@@ -3613,12 +3553,7 @@ end()
  * value in the instruction steam.
  */
 begin(_else)
-    long int delta;
-    ip++;
-	delta = (long int) *ip;
-    printk("(else) %li",delta);
-	ip += delta-1;
-    printk("(else) -  after ip = %p",ip);
+	ip += (ub4)*(ip + 1);
 end()
 /**(conditional) (if)
  * Tests TOS. If zero, the instruction pointer is incremented. Otherwise,
@@ -3626,19 +3561,11 @@ end()
  * instruction stream.
  */  
 begin(_if)
-  long int delta;
-  float flagv;
-  
-  ip++;
-  delta = (long int) *ip;   // value under the current IP is a delta
-  flagv = fpop(sst);
-  
-  printk("(if) branch if NOT zero - flagv = %f   delta = %li",flagv,delta);
-  if ( delta != 0 )
-	ip += delta-2;
-  else
-	ip++;
-//	exec(*adr(_else));  // doesn't return
+	if ( fpop(sst) != FALSE )
+		ip++;
+	else
+		/* Doesn't return! */
+		exec(*adr(_else));
 end()
 
 /**(iterative) ({do) 
@@ -4028,11 +3955,8 @@ begin(compile)
 		if ( pad->l < 1 )
 			break;
 		
-		printk("Word to look up --> >>%s<<",&pad->s);
 		if ( ( entry = stt_lookup( &pad->s ) ) != NULL )
 		{	
-	        printk("word found: %p",entry);
-			printk("      name: >>%s<<",entry->name);
 			/* Is a word */
 			if ( state || entry->type & A_IMM )
 			{
@@ -4048,8 +3972,7 @@ begin(compile)
 			}
 			else
 			{	
-				printk("Compiling word >>%s<<", entry->name);
-				printk("push(cst:%p,entry%p);",cst,entry);
+				printk("\tword");
 				push(cst,entry);
 			}
 		}
@@ -4112,27 +4035,13 @@ begin(compile)
 #endif
 		else
 		{
-			printk("Compiling numeric literal >>%s<<",&pad->s);
 			spush(sst,pad);
 			st_iliteral();
 			
-			cell xxx;
-			long int yyy;
-			void *zzz;
-			
-			if ( fpop(sst) != FALSE ) {
-				printk("new and improved st_lit()");
-				push(cst,(stt_lookup("l()")));
-				xxx = pop(sst);  // pointer to a cell
-				yyy = xxx.v.f;
-				zzz = xxx.v.p;
-				push(cst,zzz);
-				printk("Pushed %li",yyy);
-			}				
-			else {
-				printk("exec(*undefined));");
+			if ( fpop(sst) != FALSE )
+				st_lit();	
+			else
 				exec(*adr(undefined));
-			}
 		}
 	}
 
@@ -4213,24 +4122,12 @@ end()
  * Execute the contents of the compile stack.
  */
 begin(execc)
- 	push(rst,((rcell){ self, ip }));
+//	push(rst,((rcell){ self, ip }));
 	push(rst,((rcell){ line, ip }));
 	push(cst,(stt_lookup("(;)")));
 	
 	line->size = cst - cstmin;
 
-	ip = cstmin;
-	ip += 1;
-	
-	printk("tib --> %s",&tib->s);  // show the buffer
-	printk("initial cst: %p, cstmin: %p",cst,cstmin);
-	printk("ip = %p",ip);
-	printk("**ip --> %s",(*ip)->name);
-//	execute(*ip);
-    ip--;    // bug fix
-
-    exec(*adr(next));  // jump to the NEXT interpreter
-
-	
+	ip = (void *)cstmin;
 end()
 

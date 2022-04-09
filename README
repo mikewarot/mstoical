@@ -1,18 +1,7 @@
 
-S  T  O  I  C  A  L			https://github.com/mikewarot/stoical
+S  T  O  I  C  A  L					http://stoical.sf.net
+
 (c) 2002 Jonathan Moore Liles
-(c) 2020 Michael Warot  
-
-----Forward ----
-This doesn't work yet... This is my 4th day doing any serious amount of hacking
-in C, and I've never used autoconf, etc. Right now, it's all based on the
-GPL2 licensed source from Jonathan Moore Liles, and I just hacked it enough
-to get it to compile on my machine.
-Windows 10 --> WSL --> Ubuntu 64 bit, with gcc
-
-I had gotten a bit furhter, but didn't have the git history, and got a bit
-confused, so here we are with something with a proper history, and likely a
-better basis for improvement.
 
 ----Structure - -     -
 

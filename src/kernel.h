@@ -185,7 +185,7 @@ typedef struct {
 #define end()		goto *adr(next); }
 #define exec(a)		goto a
 #ifdef PROFILE
-#	define execute(ad)	({self = ad; printk("%s self.code = %p",self->name,*self->code);     self->called++;exec(*self->code);})
+#	define execute(ad)	({self = ad;self->called++;exec(*self->code);})
 #else
 #	define execute(ad)	({self = ad; exec(*self->code); })
 #endif
