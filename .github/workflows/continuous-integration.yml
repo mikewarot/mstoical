@@ -25,11 +25,12 @@ jobs:
             os: macos-10.15
             cc: gcc-10
             cmake_generator: "Unix Makefiles"
+          # FIXME: This project won't compile on Windows because it requires UNIX/POSIX library routines
           # NOTE: CC seems to be ignored on Windows, but specify it anyway for consistency
-          - platform_name: windows
-            os: windows-2019
-            cc: msvc
-            cmake_generator: ""
+          # - platform_name: windows
+          #   os: windows-2019
+          #   cc: msvc
+          #   cmake_generator: ""
 
     steps:
       - uses: actions/checkout@v2
