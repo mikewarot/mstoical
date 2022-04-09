@@ -13,7 +13,10 @@ Makefile
 
 /bin/
 /libtool
+/src/.depend
+
 /doc/stoical.1
+stoical
 
 # Build artifacts
 *.o
