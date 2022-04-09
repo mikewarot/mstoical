@@ -22,6 +22,12 @@
 /* String manipulation routines. */
 
 
+/* return the C-string -- char* pointer to the string's data */
+char *c_str(string *s)
+{
+	return &s->s;
+}
+
 /* duplicate string. malloc is used to allocate memory for the new string. */
 string *stringdup ( string *s )
 {

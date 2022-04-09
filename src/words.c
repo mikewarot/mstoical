@@ -320,13 +320,13 @@ begin(print)
 	eol = TRUE;
 
 	/* copy the remainder of the line into the pad */
-	memcpy( &pad->s, &tib->s + tibp, 1 + tib->l - tibp );
+	memcpy( c_str(pad), c_str(tib) + tibp, 1 + tib->l - tibp );
 
 	/* set the length of the new pad and append a newline */
-	pad->l = strlen( &pad->s );
+	pad->l = strlen( c_str(pad) );
 
-	(&pad->s)[pad->l]	= '\n';
-	(&pad->s)[++pad->l]	= '\0';
+	c_str(pad)[pad->l]	= '\n';
+	c_str(pad)[++pad->l]	= '\0';
 
 	/* push the address of pad, and call MSG */
 	spush(sst,pad);
@@ -1036,8 +1036,8 @@ begin(cat)
 
 	s = gmalloc( sizeof(string) + len + 1, gstack, &gst );
 
-	memcpy( &s->s, &one->s, one->l );
-	memcpy( &s->s + one->l, &two->s, two->l + 1);
+	memcpy( c_str(s), c_str(one), one->l );
+	memcpy( c_str(s) + one->l, c_str(two), two->l + 1);
 
 	s->l = len;
 	
@@ -1055,7 +1055,7 @@ begin(count)
 	string *s;
 
 	s = spop(sst);
-	ppush(sst,&s->s);
+	ppush(sst,c_str(s));
 	fpush(sst,s->l);
 end()
 /**(string) type
@@ -1082,7 +1082,7 @@ begin(stype)
 
 	n = gmalloc( sizeof(string) + len + 1, gstack, &gst );
 
-	memcpy( &n->s, s, len + 1 );
+	memcpy( c_str(n), s, len + 1 );
 
 	n->l = len;
 
@@ -1102,7 +1102,7 @@ begin(msg)
 
 	if ( s->l )
 	{
-		ppush(sst,&s->s);
+		ppush(sst,c_str(s));
 		fpush(sst,s->l);
 
 		exec(*adr(putln));
@@ -1147,9 +1147,9 @@ begin(include)
 	n = gmalloc( sizeof(string) + s->l + l + 1, gstack, &gst );
 
 	/* copy library root and filename into the new string */
-	memcpy( &n->s, libroot, l );
-	(&n->s)[l] = '/';
-	memcpy( &n->s + l + 1, &s->s, s->l + 1 );
+	memcpy( c_str(n), libroot, l );
+	c_str(n)[l] = '/';
+	memcpy( c_str(n) + l + 1, c_str(s), s->l + 1 );
 
 	spush(sst,n);
 
@@ -1337,7 +1337,7 @@ begin(writeln)
 	f = ppop(sst);
 	s = spop(sst);
 	
-	fpush(sst,fwrite( &s->s, 1, s->l, f->fp ));
+	fpush(sst,fwrite( c_str(s), 1, s->l, f->fp ));
 end()
 /**(io) readln
  * "handle READLN"
@@ -1362,15 +1362,15 @@ begin(readln)
 		n = realloc( n, sizeof(string) + l + BUFSIZ );
 		
 		/* setup overflow detector */
-		(&n->s)[ l + BUFSIZ ] = 'x';
+		c_str(n)[ l + BUFSIZ ] = 'x';
 
-		if ( fgets( &n->s + l, BUFSIZ, f->fp ) == NULL )
+		if ( fgets( c_str(n) + l, BUFSIZ, f->fp ) == NULL )
 		{
 			eof = 1;
 			break;
 		}
 
-		if ( (&n->s)[ l + BUFSIZ ] == 'x' )
+		if ( c_str(n)[ l + BUFSIZ ] == 'x' )
 			/* didn't overflow. done. */
 				break;
 
@@ -1379,7 +1379,7 @@ begin(readln)
 
 	if ( ! eof ) {
 		/* resize and mark the string for collection */
-		n->l = strlen( &n->s );
+		n->l = strlen( c_str(n) );
 		n = realloc( n, sizeof(string) + n->l + 1 );
 		n = gmark( n, gstack, &gst );
 
@@ -1448,7 +1448,7 @@ begin(stat)
 	int i;
 	
 	n = fpop(sst) + 1;
-	name = (char*)&(idx(sst,(n - 1)).v.s->s);
+	name = c_str(idx(sst,(n - 1)).v.s);
 
 	printk("stat'ing file %s", name );
 	
@@ -1651,8 +1651,8 @@ begin(readdir)
 
 		n = gmalloc( sizeof(string) + len + 1, gstack, &gst );
 		n->l = len;
-		memcpy( &n->s, ent->d_name, len );
-		(&n->s)[len] = '\0';
+		memcpy( c_str(n), ent->d_name, len );
+		c_str(n)[len] = '\0';
 		
 		spush(sst,n);
 		fpush(sst,TRUE);
@@ -1993,7 +1993,7 @@ begin(left_angle_hash)
 	hash_cnt.parm.type = T_FLT;
 	hash_cnt.parm.v.f = 0;
 	hash_ptr.parm.type = T_PTR;
-	hash_ptr.parm.v.p = &pad->s + 32;
+	hash_ptr.parm.v.p = c_str(pad) + 32;
 end()
 begin(hash_right_angle)
 	/* Discard TOS. Push the contents of hash_ptr. Push the
@@ -2123,7 +2123,7 @@ end()
  * Compare two strings.
  */
 begin(dolar_eq)
-	if ( strcmp(&spop(sst)->s,&spop(sst)->s) == 0 )
+	if ( strcmp(c_str(spop(sst)),c_str(spop(sst))) == 0 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2142,7 +2142,7 @@ end()
  * Compare two strings.
  */
 begin(dolar_ne)
-	if ( strcmp(&spop(sst)->s,&spop(sst)->s) != 0 )
+	if ( strcmp(c_str(spop(sst)),c_str(spop(sst))) != 0 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2296,7 +2296,7 @@ end()
  * space.
  */
 begin(dot_d)
-	ppush(sst,&pad->s);
+	ppush(sst,c_str(pad));
 end()
 /**(compiler) stack - (new)
  * "1 2 3 stack"
@@ -2391,7 +2391,7 @@ begin(abort)
 	eol   = FALSE;
 	eoc   = TRUE;
 
-	strcpy( &tib->s, "(:) nop" );
+	strcpy( c_str(tib), "(:) nop" );
 	tib->l = 7;
 	tibp = 0;
 
@@ -2555,7 +2555,7 @@ begin(_paren_colon_brace)
 
 	name = spop(sst);
 
-	entry = stt_lookup(&name->s);
+	entry = stt_lookup(c_str(name));
 	
 	if ( entry == NULL || ! (entry->type & A_CHECK) )
 	{
@@ -2818,7 +2818,7 @@ begin(x)
 	re_flags = 0;
 	for ( i = 0; i < pad->l; i++ )
 	{
-		switch ( (&pad->s)[i] )
+		switch ( c_str(pad)[i] )
 		{
 			case 'b': { re_flags &= ! REG_EXTENDED;	break; };
 			case 'i': { re_flags |= REG_ICASE;	break; };
@@ -2855,7 +2855,7 @@ begin(rs_)
 	r	= scpop(sst);
 	os	= spop(sst);
 	sl	= os->l;
-	s	= &os->s;
+	s	= c_str(os);
 	
 	sp = s;
 
@@ -2912,7 +2912,7 @@ begin(rs_)
 		 * for it. This will be extended automatically, if
 		 * insufficient. */
 		ns = malloc( sizeof(string) + (siz = sl + rl + 128) );
-		n = np = &ns->s; 
+		n = np = c_str(ns);
 	
 		for (;;)
 		{
@@ -2936,7 +2936,7 @@ begin(rs_)
 							      sizeof(string) +
 							      (siz += 128 +
 							      rl + p[0].rm_so) );
-						np = &ns->s;
+						np = c_str(ns);
 						n = np + ofs;
 					}
 					
@@ -2967,7 +2967,7 @@ begin(rs_)
 						      sizeof(string) +
 						      (siz += 128 +
 						      (sl - ( s - sp ))));
-					np = &ns->s;
+					np = c_str(ns);
 					n = np + ofs;
 				}
 				
@@ -3041,10 +3041,10 @@ begin(r_)
 					n = gmalloc( sizeof(string) + 1 + len,
 							gstack, &gst );
 
-					memcpy( &n->s, &s[ p[i].rm_so ], len );
+					memcpy( c_str(n), &s[ p[i].rm_so ], len );
 					
 					n->l		= len;
-					(&n->s)[len]	= '\0';
+					c_str(n)[len]	= '\0';
 					
 					spush(sst,n);
 				}
@@ -3320,16 +3320,16 @@ begin(branch)
 
 	n = malloc( sizeof(string) + s->l + 2 );
 
-	memcpy( &n->s, &s->s, s->l + 1 );
+	memcpy( c_str(n), c_str(s), s->l + 1 );
 
-	(&n->s)[ s->l ] = '<';
-	(&n->s)[ ++s->l ] = '\0';
+	c_str(n)[ s->l ] = '<';
+	c_str(n)[ ++s->l ] = '\0';
 	n->l = s->l;
 	
 	/* Create a vocabulary entry with the name "NAME"<
 	 * and with a value being a pointer to the new branch. */
 	
-	rpush(sst,voc_create(&n->s));
+	rpush(sst,voc_create(c_str(n)));
 	spush(sst,n);
 	st_constant();
 
@@ -3351,7 +3351,7 @@ begin(disregard)
 	
 	s = spop(sst);
 
-	if ( ( entry = voc_lookup( current, s->l, &s->s ) ) != NULL )
+	if ( ( entry = voc_lookup( current, s->l, c_str(s) ) ) != NULL )
 		entry_delete(current, entry);
 end()
 begin(badtype)
@@ -3359,7 +3359,7 @@ begin(badtype)
 end()
 begin(undefined)
 	printk("undefined");
-	printf("%s undefined\n", &pad->s );
+	printf("%s undefined\n", c_str(pad) );
 	exec(*adr(abort));
 end()
 /**(io) frdline
@@ -3374,18 +3374,18 @@ begin(frdline)
 	eol = FALSE;
 	eoc = TRUE;
 
-	if ( fgets( &tib->s, KSIZE - 2, finput ) == NULL )
+	if ( fgets( c_str(tib), KSIZE - 2, finput ) == NULL )
 		/* eof - return control to the file
 		 * that loaded us (that's ;f's job) */
 		exec(*adr(semicolon_f));
 
-	len = strlen( &tib->s );
+	len = strlen( c_str(tib) );
 	
 	if ( len >= KSIZE - 2 )
 		error("input buffer full");
 
 	tib->l = len;
-	(&tib->s)[len - 1] = '\0';
+	c_str(tib)[len - 1] = '\0';
 	tibp = 0;
 end()
 /**(io) rdline
@@ -3408,10 +3408,10 @@ begin(rdline)
 
 	len = strlen(str);
 #else
-	fgets( &tib->s, KSIZE, stdin );
-	len = strlen( &tib->s );
+	fgets( c_str(tib), KSIZE, stdin );
+	len = strlen( c_str(tib) );
 	/* remove the newline */
-	(&tib->s)[ --len ] = '\0';
+	c_str(tib)[ --len ] = '\0';
 #endif
 
 	if ( len >= KSIZE - 1) 
@@ -3419,7 +3419,7 @@ begin(rdline)
 		
 #ifdef READLINE	
 	add_history( str );
-	strncpy( &tib->s, str, len + 1 );
+	strncpy( c_str(tib), str, len + 1 );
 	free(str);
 	}
 #endif
@@ -3457,7 +3457,7 @@ begin(_)
 	word();
 	drop(sst);
 
-	rpush(sst,stt_lookup(&pad->s));
+	rpush(sst,stt_lookup(c_str(pad)));
 	st_lit();
 
 	if ( peek(cst) == NULL )
@@ -3472,7 +3472,7 @@ begin(ascii)
 	word();
 	drop(sst);
 
-	fpush(sst,*( &pad->s ));
+	fpush(sst,*( c_str(pad) ));
 	st_lit();
 end()
 /**(dictionary) // - (*)
@@ -3819,7 +3819,7 @@ begin(_paren_brace_each)
 				
 				n = gmalloc( sizeof(string) + l + 1, gstack, &gst );
 				n->l = l;
-				memcpy( &n->s, s, l + 1 );
+				memcpy( c_str(n), s, l + 1 );
 
 				peek(lst).type	= T_STR;
 				peek(lst).v.s	= n;
@@ -3953,7 +3953,7 @@ begin(compile)
 		if ( pad->l < 1 )
 			break;
 		
-		if ( ( entry = stt_lookup( &pad->s ) ) != NULL )
+		if ( ( entry = stt_lookup( c_str(pad) ) ) != NULL )
 		{	
 			/* Is a word */
 			if ( state || entry->type & A_IMM )
@@ -3974,7 +3974,7 @@ begin(compile)
 				push(cst,entry);
 			}
 		}
-		else if ( *( &pad->s ) == '\"' || *( &pad->s ) == '\'' )
+		else if ( *( c_str(pad) ) == '\"' || *( c_str(pad) ) == '\'' )
 		{
 			string *s;
 			printk("\tstring literal");
@@ -3995,7 +3995,7 @@ begin(compile)
 			push(ccst,((ccell){ free, s }));
 		}
 #ifdef REGEX
-		else if ( *( &pad->s ) == '|' )
+		else if ( *( c_str(pad) ) == '|' )
 		{
 			int v;
 			regex_t *reg;
@@ -4005,7 +4005,7 @@ begin(compile)
 			/* interpolate escape sequences */
 			interpolate( pad, 1 );
 			
-			v = regcomp( reg, &pad->s,
+			v = regcomp( reg, c_str(pad),
 				     REG_EXTENDED ^ re_flags );
 							
 			/* FIXME: check for errors... */
@@ -4087,7 +4087,7 @@ begin(env_right_angle)
 
 		n = gmalloc( sizeof(string) + len + 1, gstack, &gst );
 
-		memcpy( &n->s, s, len + 1 );
+		memcpy( c_str(n), s, len + 1 );
 		n->l = len;
 
 		spush(sst,n);

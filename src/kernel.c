@@ -216,7 +216,7 @@ if ( data->main )
 
 			s = a[i].v.s;
 			
-			strcpy( &s->s, argv[i] );
+			strcpy( c_str(s), argv[i] );
 		}
 	}
 
@@ -276,9 +276,9 @@ if ( data->main )
 	
 	printk("Bootstrapping interactive compiler...");
 
-	strcpy(&tib->s, "(:) 'def include" );
+	strcpy(c_str(tib), "(:) 'def include" );
 
-	tib->l = strlen(&tib->s);
+	tib->l = strlen(c_str(tib));
 	tibp = 0;
 	eol = FALSE; eoc = TRUE;
 

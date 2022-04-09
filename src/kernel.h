@@ -345,6 +345,7 @@ void stack_mark( cell *stmin, cell *st, void **gstack, unsigned char *gst );
 
 /* string.c function prototypes */
 
+char *c_str(string *s);
 string* stringdup( string *s );
 void interpolate( string *str, int mode );
 int st_word( string *tib, int *tibp, string *pad );
