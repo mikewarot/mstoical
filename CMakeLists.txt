@@ -1,7 +1,7 @@
 # TODO: consider lowering this version requirement to some lower v3.x
 cmake_minimum_required(VERSION 3.17)
 
-project(STOICAL VERSION 0.1.9 LANGUAGES C)
+project(stoical VERSION 0.1.9 LANGUAGES C)
 # from looking at the code, this project was probably written in ANSI C, with GNU extensions and some C99 features
 set(CMAKE_C_STANDARD 99)
 
@@ -12,8 +12,10 @@ set(
     "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
 )
 set(STOICAL_ESCAPED_VERSION_STRING "\"${STOICAL_VERSION_STRING}\"")
-# XXX: Hardcoded libroot path for now. TODO: use CMake to set it programmatically
-set(STOICAL_ESCAPED_LIBROOT_STRING "\"/usr/local/lib/stoical\"")
+
+include(GNUInstallDirs)
+set(STOICAL_LIBROOT "${CMAKE_INSTALL_FULL_LIBDIR}/stoical")
+set(STOICAL_ESCAPED_LIBROOT_STRING "\"${STOICAL_LIBROOT}\"")
 # END macros
 
 # add custom dependencies directory
@@ -75,3 +77,9 @@ add_test(NAME stoical_help COMMAND stoical -h)
 # add_test(NAME stoical_execute COMMAND stoical -e)
 add_test(NAME stoical_library_path COMMAND stoical -l "${CMAKE_SOURCE_DIR}/lib" -f "${CMAKE_SOURCE_DIR}/examples/threads")
 add_test(NAME stoical_run_file COMMAND stoical -f "${CMAKE_SOURCE_DIR}/examples/threads")
+
+# install runtime, lib, docs and manpage
+install(TARGETS stoical RUNTIME)
+install(DIRECTORY "lib/" DESTINATION "${CMAKE_INSTALL_LIBDIR}/stoical")
+install(FILES COPYING README doc/Stoical doc/words TYPE DOC)
+install(FILES doc/stoical.1 DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")

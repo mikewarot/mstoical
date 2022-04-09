@@ -1,4 +1,4 @@
-#! ../stoical
+#!/usr/bin/env stoical
 % This tiny program implements its own terminal control routines and launches
 % threads of animated ascii fish. Please note that this code was intentionally
 % made inefficient in order to prove that the garbage collection works. It also % introduces large delays in the output so that the drawings are visible.

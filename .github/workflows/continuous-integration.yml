@@ -60,8 +60,8 @@ jobs:
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         run: ctest -C $BUILD_TYPE --no-tests=error
 
-      # - name: Test Install
-      #   working-directory: ${{github.workspace}}/build
-      #   shell: bash
-      #   # Test install with CMake to the "test_install" directory
-      #   run: cmake --install . --config $BUILD_TYPE
+      - name: Test Install
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        # Test install with CMake to the "test_install" directory
+        run: cmake --install . --config $BUILD_TYPE

@@ -1,4 +1,4 @@
-#! ../stoical
+#!/usr/bin/env stoical
 
 % Generate directory listing.
 
