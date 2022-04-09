@@ -1,0 +1,19 @@
+#! ../stoical
+
+% Test associative arrays
+
+'test load
+
+"Testing arrays...\n" =
+
+[ 1 2 3 ] 'ary[ array
+
+% initialization
+ary[ 1 ]@ 2 eq ok?
+% replace
+'foo ary[ 1 ]! ary[ 1 ]@ 'foo eq ok?
+% insert
+% delete
+
+fail @ exit
+

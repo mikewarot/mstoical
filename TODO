@@ -1,0 +1,29 @@
+
+STOICAL TODO list.
+
+---	Implement terminal CONTROL abstraction, allowing memory buffer/array
+type access to the screen, using /dev/vcsa directly when possible. Screens
+would be stacked in layers. This way a new thread could simply add a layer for
+itself to be used throughout its execution.
+
+---	Implement mmap() for strings, hashes and arrays.
+
+---	Allow some infix character to separate words so that the connections in
+statements like "() foo" can be more clear.. ie. "().foo". Though, whichever
+character is used will become useless for any other purpose. (much like the
+space already is). This character could actually do more than just a space; It
+could build a list of its operands someplace so that some sort of object
+notation might be used.
+	
+---	Taking into consideration the fact that most programs will only consume
+about 10 stack cells at any one time, it may be a good idea to dynamically
+enlarge the stack upon an overflow exception, up to a specified limit. This
+would reward efficient programmers with more efficient memory usage.
+
+---	Allow naming of stack positions. This would help with deep
+manipulation, not to mention allowing the early HP Calculator x/y style
+notation.
+
+--	Use a flag stack for conditionals and tests? It could be implemented
+as a bitmap.
+

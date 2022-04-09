@@ -1,0 +1,24 @@
+#! ../stoical
+
+% Generate directory listing.
+
+'. 'dir variable
+args[ @ 2 ge if{ args[ 1 ]@ dir ! } dir @ dup opendir
+
+if{	"Directory \"" 3 idup + = "\"\n" =
+}else{	"error opening directory\n" = bye }
+
+{ dup readdir }while{
+	dup |^[^.]|
+	if{
+		drop
+		dup dup " (" + =
+		4 idup '/ + swap +
+		[ 'size ] stat
+		if{ 1024 / <# #s #> type 'k) = }else{ drop }
+		'\n = drop
+	}else{ drop }
+}
+closedir
+
+

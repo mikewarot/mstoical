@@ -1,0 +1,38 @@
+#! ../stoical
+% This tiny program implements its own terminal control routines and launches
+% threads of animated ascii fish. Please note that this code was intentionally
+% made inefficient in order to prove that the garbage collection works. It also % introduces large delays in the output so that the drawings are visible.
+
+false warnings ! 
+% Get environment variables.
+'(env) : dup env> dup if{ iliteral drop 2 - } swap constant ;
+'LINES		(env)
+'COLUMNS	(env)
+COLUMNS eqz LINES eqz or
+if{ "You must export LINES and COLUMNS to use this program.\n" = bye }
+
+% terminal control words.
+'<%	: '	;
+'clr	: <# #s ascii ; #put #> stype + ;
+'bg	: 40 + clr ; 
+'fg	: 30 + clr ;
+'bold	: 1 clr ;
+'dim	: 0 clr ;
+'esc	: '\e[ swap + ;
+'%>	: esc 'm + ;
+'clear	: '2J esc 'H esc + ;
+'move	: swap <# #s #> stype esc swap clr 'H + ;
+
+% sleep a random amount, for effect.
+'snooze : 0 rand 2000 mod delay ;
+
+'one : get bye ;
+'two :  COLUMNS ( dup -i move <% 2 fg bold %> " >" + + = snooze )
+	COLUMNS ( dup i move <% dim 2 fg %> "< " + + = snooze ) ; 
+
+() one thread detach
+
+% create and rejoin with many threads to prove memory seal.
+
+{ LINES ( i () two thread nip ) LINES ( join drop ) 0 }until
+

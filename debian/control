@@ -1,0 +1,19 @@
+Source: stoical
+Section: interpreters
+Priority: optional
+Maintainer: Jonathan M. Liles <wantingwaiting@users.sf.net>
+Standards-Version: 3.0.0.0
+
+Package: stoical
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: STack Oriented Interactive Compiler Adapted to Linux
+ is a modern re-implementation of the classic stack language STOIC. It hosts
+ features not present in the original incarnation, and some not present in many
+ languages today. These include, POSIX threading, POSIX Regular Expressions
+ dynamic memory, sockets, floating point arithmetic, passive garbage
+ collection, passive type-checking, and more. STOICAL was designed to exploit
+ the Linux environment. STOIC, a Forth like language, was conceived circa 1977
+ by Jonathan M. Sachs at the Massachusetts Institute of Technology.
+ See http://stoical.sf.net for the whole story.
+

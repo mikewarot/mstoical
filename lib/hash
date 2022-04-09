@@ -1,0 +1,28 @@
+#! /usr/local/bin/stoical
+
+% These were the place-holder associative array routines from before hashes
+% had actually been implemented. May you find them useful.
+
+warnings @ false warnings !				% disable warnings
+
+'hash		: array ;
+'hsearch	:
+	'[[ <l
+	swap dup @ 0
+	do
+		dup i ]@				% get key
+		3 idup eq
+		if					% match?
+			nip i 1+ l]] true (;)		% return index of value
+		then
+	2 +loop
+	drop drop false					% no match
+;
+')@		: hsearch if ]@ else drop mark then ;
+')!		: tuck hsearch if ]! else ]push then ;
+')delete	: hsearch if 1- 2 swap ]delete then ;
+')?		: )@ = ;
+
+warnings !						% restore warnings
+
+
