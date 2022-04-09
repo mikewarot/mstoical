@@ -2793,8 +2793,8 @@ begin(l_)
 
 	ip++;
 	a = (cell*)ip;
-	
-	((cell*)ip)++;
+
+        (cell*)ip = (cell*)ip + 1;
 	ip--;
 
 	push(sst,*a);
