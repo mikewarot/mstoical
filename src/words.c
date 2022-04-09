@@ -2009,7 +2009,12 @@ end()
 begin(hash_put)
 	/* Place character represented by the value at TOS into
 	 * the buffer. Decrement the pointer, and increment the count. */
+/*
 	*(--(char*)hash_ptr.parm.v.p) = fpop(sst);
+*/
+	hash_ptr.parm.v.p -= 1;  
+	*((char*)hash_ptr.parm.v.p) = fpop(sst);
+
 	
 	hash_cnt.parm.v.f++;
 end()
