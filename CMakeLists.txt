@@ -59,7 +59,7 @@ check_type_size("short" SIZEOF_SHORT)
 check_type_size("void*" SIZEOF_VOID_P)
 # END configure variables
 
-configure_file(config.h.in config.h @ONLY)
+configure_file(config.cmake.h.in config.h @ONLY)
 
 add_subdirectory(src)
 
