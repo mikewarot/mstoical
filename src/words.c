@@ -2797,7 +2797,7 @@ begin(l_)
 
 	b = a;
 	b++;
-	(cell*)ip = b;
+	ip = (cell*)b;
 	ip--;
 
 	push(sst,*a);
