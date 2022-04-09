@@ -66,9 +66,12 @@ target_include_directories(stoical PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CTest)
 enable_testing()
-add_test(NAME stoical COMMAND stoical)
+# XXX: interactive mode, no easy way to test currently
+# add_test(NAME stoical COMMAND stoical)
 add_test(NAME stoical_help COMMAND stoical -h)
-add_test(NAME stoical_version COMMAND stoical -v)
-add_test(NAME stoical_execute COMMAND stoical -e)
-add_test(NAME stoical_library_path COMMAND stoical -l)
-add_test(NAME stoical_run_file COMMAND stoical -f)
+# XXX: -v option is documented in the help text but isn't implemented!
+# add_test(NAME stoical_version COMMAND stoical -v)
+# XXX: documented as "Exectue the instructions 'code'" --what could this mean?
+# add_test(NAME stoical_execute COMMAND stoical -e)
+add_test(NAME stoical_library_path COMMAND stoical -l "${CMAKE_SOURCE_DIR}/lib" -f "${CMAKE_SOURCE_DIR}/examples/threads")
+add_test(NAME stoical_run_file COMMAND stoical -f "${CMAKE_SOURCE_DIR}/examples/threads")
