@@ -2,7 +2,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Print verbose debugging info */
-/* #undef DEBUG */
+#define DEBUG 1
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define HAVE_ARPA_INET_H 1
@@ -27,13 +27,13 @@
 #define HAVE_LIBM 1
 
 /* Define to 1 if you have the `pthread' library (-lpthread). */
-#define HAVE_LIBPTHREAD 1
+/* #undef HAVE_LIBPTHREAD */
 
 /* Define to 1 if you have the `readline' library (-lreadline). */
-#define HAVE_LIBREADLINE 1
+/* #undef HAVE_LIBREADLINE */
 
 /* Define to 1 if you have the `termcap' library (-ltermcap). */
-#define HAVE_LIBTERMCAP 1
+/* #undef HAVE_LIBTERMCAP */
 
 /* Define to 1 if your system has a working `malloc' function. */
 #define HAVE_MALLOC 1
@@ -118,7 +118,7 @@
 /* #undef HAVE_SYS_NDIR_H */
 
 /* Define to 1 if you have the <sys/sendfile.h> header file. */
-/* #undef HAVE_SYS_SENDFILE_H */
+#define HAVE_SYS_SENDFILE_H 1
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #define HAVE_SYS_SOCKET_H 1
@@ -140,7 +140,7 @@
 
 /* Define to 1 if `lstat' dereferences a symlink specified with a trailing
    slash. */
-/* #undef LSTAT_FOLLOWS_SLASHED_SYMLINK */
+#define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT "chezmike@gmail.com"
@@ -158,10 +158,10 @@
 #define PACKAGE_VERSION "0.1.9"
 
 /* Track invocation, times, memory and etc.. */
-/* #undef PROFILE */
+#define PROFILE 1
 
 /* Perform bounds checking on stacks and arrays */
-#define SAFE 1
+/* #undef SAFE */
 
 /* Define to 1 if the `setvbuf' function takes the buffering type as its
    second argument and the buffer pointer as the third, as on System V before
