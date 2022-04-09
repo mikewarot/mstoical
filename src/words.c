@@ -2790,11 +2790,14 @@ end()
  * and skip to the intruction following it. */
 begin(l_)
 	cell *a;
+	cell *b;
 
 	ip++;
 	a = (cell*)ip;
 
-        (cell*)ip = (cell*)ip + 1;
+	b = a;
+	b++;
+	(cell*)ip = b;
 	ip--;
 
 	push(sst,*a);
