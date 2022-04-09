@@ -59,11 +59,10 @@ check_type_size("void*" SIZEOF_VOID_P)
 
 configure_file(config.h.in config.h @ONLY)
 
-# make sure the processed version of config.h is in the include path
-# TODO: consider doing this non-globally
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 add_subdirectory(src)
+
+# make sure the processed version of config.h is in the include path
+target_include_directories(stoical PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CTest)
 enable_testing()
