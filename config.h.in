@@ -3,28 +3,6 @@
 /* Print verbose debugging info */
 #cmakedefine DEBUG
 
-/* Define if you have the <arpa/inet.h> header file. */
-#cmakedefine HAVE_ARPA_INET_H
-
-/* Define if you have the <dirent.h> header file, and it defines `DIR'.
-   */
-#cmakedefine HAVE_DIRENT_H
-
-/* Define if you don't have `vprintf' but do have `_doprnt.' */
-#cmakedefine HAVE_DOPRNT
-
-/* Define if you have the <fcntl.h> header file. */
-#cmakedefine HAVE_FCNTL_H
-
-/* Define if you have the `gethostbyname' function. */
-#cmakedefine HAVE_GETHOSTBYNAME
-
-/* Define if you have the <inttypes.h> header file. */
-#cmakedefine HAVE_INTTYPES_H
-
-/* Define if you have the `m' library (-lm). */
-#cmakedefine HAVE_LIBM
-
 /* Define if you have the `pthread' library (-lpthread). */
 #cmakedefine HAVE_LIBPTHREAD
 
@@ -34,112 +12,11 @@
 /* Define if you have the `termcap' library (-ltermcap). */
 #cmakedefine HAVE_LIBTERMCAP
 
-/* Define if your system has a working `malloc' function. */
-#cmakedefine HAVE_MALLOC
-
-/* Define if you have the `memchr' function. */
-#cmakedefine HAVE_MEMCHR
-
-/* Define if you have the `memmove' function. */
-#cmakedefine HAVE_MEMMOVE
-
-/* Define if you have the <memory.h> header file. */
-#cmakedefine HAVE_MEMORY_H
-
-/* Define if you have the `mkdir' function. */
-#cmakedefine HAVE_MKDIR
-
-/* Define if you have the <ndir.h> header file, and it defines `DIR'. */
-#cmakedefine HAVE_NDIR_H
-
-/* Define if you have the <netdb.h> header file. */
-#cmakedefine HAVE_NETDB_H
-
-/* Define if you have the <netinet/in.h> header file. */
-#cmakedefine HAVE_NETINET_IN_H
-
-/* Define if you have the `pthread_delay_np' function. */
-#cmakedefine HAVE_PTHREAD_DELAY_NP
-
 /* Define if you have the `regcomp' function. */
 #cmakedefine HAVE_REGCOMP
 
-/* Define if you have the `rmdir' function. */
-#cmakedefine HAVE_RMDIR
-
-/* Define if you have the `sendfile' function. */
-#cmakedefine HAVE_SENDFILE
-
-/* Define if you have the `setenv' function. */
-#cmakedefine HAVE_SETENV
-
-/* Define if you have the `socket' function. */
-#cmakedefine HAVE_SOCKET
-
-/* Define if `stat' has the bug that it succeeds when given the
-   zero-length file name argument. */
-#cmakedefine HAVE_STAT_EMPTY_STRING_BUG
-
-/* Define if you have the <stdint.h> header file. */
-#cmakedefine HAVE_STDINT_H
-
-/* Define if you have the <stdlib.h> header file. */
-#cmakedefine HAVE_STDLIB_H
-
-/* Define if you have the <strings.h> header file. */
-#cmakedefine HAVE_STRINGS_H
-
-/* Define if you have the <string.h> header file. */
-#cmakedefine HAVE_STRING_H
-
-/* Define if you have the `strtol' function. */
-#cmakedefine HAVE_STRTOL
-
-/* Define if `st_blksize' is member of `struct stat'. */
-#cmakedefine HAVE_STRUCT_STAT_ST_BLKSIZE
-
-/* Define if `st_blocks' is member of `struct stat'. */
-#cmakedefine HAVE_STRUCT_STAT_ST_BLOCKS
-
-/* Define if `st_rdev' is member of `struct stat'. */
-#cmakedefine HAVE_STRUCT_STAT_ST_RDEV
-
-/* Define if your `struct stat' has `st_blocks'. Deprecated, use
-   `HAVE_STRUCT_STAT_ST_BLOCKS' instead. */
-#cmakedefine HAVE_ST_BLOCKS
-
-/* Define if you have the <sys/dir.h> header file, and it defines `DIR'.
-   */
-#cmakedefine HAVE_SYS_DIR_H
-
-/* Define if you have the <sys/ndir.h> header file, and it defines `DIR'.
-   */
-#cmakedefine HAVE_SYS_NDIR_H
-
 /* Define if you have the <sys/sendfile.h> header file. */
 #cmakedefine HAVE_SYS_SENDFILE_H
-
-/* Define if you have the <sys/socket.h> header file. */
-#cmakedefine HAVE_SYS_SOCKET_H
-
-/* Define if you have the <sys/stat.h> header file. */
-#cmakedefine HAVE_SYS_STAT_H
-
-/* Define if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H
-
-/* Define if you have the <termios.h> header file. */
-#cmakedefine HAVE_TERMIOS_H
-
-/* Define if you have the <unistd.h> header file. */
-#cmakedefine HAVE_UNISTD_H
-
-/* Define if you have the `vprintf' function. */
-#cmakedefine HAVE_VPRINTF
-
-/* Define if `lstat' dereferences a symlink specified with a trailing
-   slash. */
-#cmakedefine LSTAT_FOLLOWS_SLASHED_SYMLINK
 
 /* Define to the address where bug reports for this package should be sent. */
 #cmakedefine PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
@@ -162,11 +39,6 @@
 /* Perform bounds checking on stacks and arrays */
 #cmakedefine SAFE
 
-/* Define if the `setvbuf' function takes the buffering type as its
-   second argument and the buffer pointer as the third, as on System V before
-   release 3. */
-#cmakedefine SETVBUF_REVERSED
-
 /* The size of a `double', as computed by sizeof. */
 #cmakedefine SIZEOF_DOUBLE @SIZEOF_DOUBLE@
 
@@ -184,15 +56,6 @@
 
 /* The size of a `void *', as computed by sizeof. */
 #cmakedefine SIZEOF_VOID_P @SIZEOF_VOID_P@
-
-/* Define if you have the ANSI C header files. */
-#cmakedefine STDC_HEADERS
-
-/* Define to empty if `const' does not conform to ANSI C. */
-#cmakedefine const
-
-/* Define to `long' if <sys/types.h> does not define. */
-#cmakedefine off_t
 
 /* Make sense of all this */
 
