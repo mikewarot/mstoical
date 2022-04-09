@@ -1,4 +1,4 @@
-#! /usr/local/bin/stoical
+#!/usr/bin/env stoical
 
 % This file contains high-level definitions to be automatically loaded by
 % STOICAL at startup. Documentation is automatically generated from the

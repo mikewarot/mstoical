@@ -1,4 +1,4 @@
-#! /usr/local/bin/stoical
+#!/usr/bin/env stoical
 
 % STOIC Compatibility Module.
 % 

@@ -1,4 +1,4 @@
-#! /usr/local/bin/stoical
+#!/usr/bin/env stoical
 % 04/24/02 - Jonathan Moore Liles.
 % Library to approximate Rob Spruit's Cryptic Constructs, in STOICAL.
 
