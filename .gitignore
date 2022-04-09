@@ -1,3 +1,5 @@
 *.o
 autom4te.cache/*
 stoical
+build/*
+!build/.gitkeep
