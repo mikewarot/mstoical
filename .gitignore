@@ -1,0 +1,22 @@
+# http://www.gnu.org/software/autoconf
+/config.log
+/config.h
+/config.status
+/stamp-h1
+
+# http://www.gnu.org/software/automake
+.deps/
+.libs/
+
+# Generated Makefile 
+Makefile
+
+/bin/
+/libtool
+/doc/stoical.1
+
+# Build artifacts
+*.o
+*.a
+*.lo
+*.la
