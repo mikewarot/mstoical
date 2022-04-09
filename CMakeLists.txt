@@ -61,3 +61,12 @@ configure_file(config.h.in config.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(src)
+
+include(CTest)
+enable_testing()
+add_test(NAME stoical COMMAND stoical)
+add_test(NAME stoical_help COMMAND stoical -h)
+add_test(NAME stoical_version COMMAND stoical -v)
+add_test(NAME stoical_execute COMMAND stoical -e)
+add_test(NAME stoical_library_path COMMAND stoical -l)
+add_test(NAME stoical_run_file COMMAND stoical -f)
