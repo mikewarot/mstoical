@@ -23,7 +23,7 @@ jobs:
             cmake_generator: "Unix Makefiles"
           - platform_name: macos
             os: macos-10.15
-            cc: clang
+            cc: gcc-10
             cmake_generator: "Unix Makefiles"
           # NOTE: CC seems to be ignored on Windows, but specify it anyway for consistency
           - platform_name: windows
