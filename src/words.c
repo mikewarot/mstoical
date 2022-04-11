@@ -540,11 +540,11 @@ begin(bracket_at)
 	else if ( i >= entry->parm.v.f )
 		error("array index out of bounds\n");
 #endif
-		
-	a = (&entry->parm)[1].v.p;
 
-	i++;
+	a = (&entry->parm)[1].v.p;
 	
+	i++; /* internal 1-based indexing */
+
 #ifdef THREADS
 	if ( entry->type & A_SHARE )
 	{	
@@ -585,9 +585,9 @@ begin(bracket_bang)
 	else if ( i >= entry->parm.v.f )
 		error("array index out of bounds\n");
 #endif
-	
-	i++;
-	
+
+	i++; /* internal 1-based indexing */
+
 	ptr	= &((cell*)(&entry->parm)[1].v.p)[i];
 	
 	if ( ptr->type == T_STR )
@@ -684,7 +684,8 @@ begin(bracket_pop)
 	}
 	else
 	{	
-		i++;
+		i++; /* internal 1-based indexing */
+
 		a = (&entry->parm)[1].v.p;
 
 		if ( a[i].type == T_STR )
@@ -729,11 +730,11 @@ begin(bracket_delete)
 	if ( i < 0 )
 		i += entry->parm.v.f;
 	
-	i++;
+	i++; /* internal 1-based indexing */
 
 	/* protect against boundary */
 	n = max(n,((entry->parm.v.f - i) + 1));
-	
+
 	ptr	= &((cell*)(&entry->parm)[1].v.p)[i];
 
 	/* free strings */
@@ -3186,12 +3187,13 @@ begin(array)
 	
 	n = fpop(sst);
 	
-	a = malloc( (n + 128) * sizeof( cell ) );
+	a = malloc( (n + 1 + 128) * sizeof( cell ) ); /* reserve 0th elem */
 
 	entry->type = A_ARRAY;
 	entry->code = adr(_variable);
 
-	a += n;
+	/* NOTE: here we fill the array's data for 1-based indexing internally,
+	 * leaving the 0th cell allocated but not used. */
 
 	/* elements must be protected from the gc */
 	for ( i = n; i > 0; i-- )
@@ -3209,7 +3211,7 @@ begin(array)
 			b.v.s = s;
 		}
 		
-		*(a--) = b;
+		a[i] = b;
 	}
 
 	/* record the array's length */
@@ -3750,8 +3752,10 @@ end()
  */
 begin(_right_bracket)
 	cell *oldsst;
+	int n;
 	oldsst = ppop(lst);
-	fpush(sst,(long)(sst - oldsst));
+	n = (int)(sst - oldsst);
+	fpush(sst,n);
 end()
 /**(stack) [ - (*)
  * Execute +check. Push the address of ([) onto the compile stack.
