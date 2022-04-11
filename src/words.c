@@ -2009,8 +2009,12 @@ end()
 begin(hash_put)
 	/* Place character represented by the value at TOS into
 	 * the buffer. Decrement the pointer, and increment the count. */
-	*(--(char*)hash_ptr.parm.v.p) = fpop(sst);
-	
+
+	{
+		char *s = (char*)hash_ptr.parm.v.p;
+		*(--s) = fpop(sst);
+		hash_ptr.parm.v.p = s;
+	}
 	hash_cnt.parm.v.f++;
 end()
 begin(hash_a)
@@ -2788,8 +2792,8 @@ begin(l_)
 
 	ip++;
 	a = (cell*)ip;
-	
-	((cell*)ip)++;
+
+	ip = (struct voc_entry **)(a + 1);
 	ip--;
 
 	push(sst,*a);
@@ -3198,7 +3202,7 @@ begin(array)
 			string *s;
 			/* string must be copied and therefore protected
 			 * from the garbage collector. */
-			
+
 			s = malloc( sizeof(string) + b.v.s->l + 1 );
 			memcpy( s, b.v.s, sizeof(string) + b.v.s->l + 1 );
 
