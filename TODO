@@ -1,6 +1,13 @@
 
 STOICAL TODO list.
+Resolve all gcc compile warnings
 
+Add more examples
+
+
+
+
+Old list from 2002:
 ---	Implement terminal CONTROL abstraction, allowing memory buffer/array
 type access to the screen, using /dev/vcsa directly when possible. Screens
 would be stacked in layers. This way a new thread could simply add a layer for

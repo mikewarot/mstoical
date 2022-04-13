@@ -138,6 +138,7 @@ interpolate( string *str, int mode )
 					break;
 				}
 			}
+			break;
 			default:
 			{
 				s[j++] = s[i];
