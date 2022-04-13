@@ -1328,7 +1328,7 @@ shared
 int
 
    "( 1.3 - 1 )"
-   Round float at TOS to an integer value. Not very pretty, as the gritty bits
+   Round double at TOS to an integer value. Not very pretty, as the gritty bits
    are left to your specific C compiler. But, since I've been GCC-ific so far,
    why stop now? FIXME: My name is pandora. This is my box.
 

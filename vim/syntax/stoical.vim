@@ -23,26 +23,26 @@ syn keyword stoical_todo contained FIXME TODO
 syn match stoical_todo contained 'Copyright\(\s([Cc])\)\=\(\s[0-9]\{2,4}\)\='
 
 " Word set.
-syn keyword stoical_thread thread detach join me cancel delay shared 
-syn keyword stoical_compiler exit ^ eoc eol stack stack vocab decompile vstack rtn bye inspect prompt compile clearcst eval execc 
-syn keyword stoical_error errch abort 
-syn keyword stoical_math rand srand radix # #put <#> octal decimal hex 
-syn keyword stoical_stack cells mark swap drop dup over nip tuck -rot +rot flip idup idrop <l l> <c c> .t retype [[ ]] l]] [ ] 
-syn keyword stoical_conditional mark? check +check -check { } (else) (if) {if {else (else) {ifelse if{ }else{ if else then 
-syn keyword stoical_constants true false 
-syn keyword stoical_unary 1+ 1- int abs bool not eqz ltz -i -j -k exec 
-syn keyword stoical_binary add - / * mod /mod and or xor feq fne lt gt le ge + eq 
-syn keyword stoical_var @ ! ? @@ 1+! 
-syn keyword stoical_array ]@ ]! ]push pop ]delete ]insert )@ )! )delete array hash ]? )? 
-syn keyword stoical_variables pad warnings current .c .l .r .v .d tib 
 syn keyword stoical_string cat count type stype msg $eq $ne word iliteral string ascii 
-syn keyword stoical_source load include ;f 
-syn keyword stoical_io chdir mkdir rmdir unlink mkfifo umask open close write read writeln readln flush seek stat (get) (put) (getln) (putln) get put ttyput ttyget getln putln ttyputln ttygetln opendir closedir readdir socket bind listen accept connect shutdown sendfile frdline rdline = cr space spaces tab 
-syn keyword stoical_system args[ system env> <env (env) 
-syn keyword stoical_iterative i j k redo ({do) ({loop) ({+loop) {loop {+loop ({() ({)) {( ()do) (){each) ){each {until {while break }until }while{ loop{ +loop{ )each{ ( ) begin end 
-syn keyword stoical_dictionary (:) ({:) (:{) ):{ ():{) enter ({) (b{) (}) {}> (;) immediate (constant) fconstant (variable) ((variable)) definitions stoical< (branch) branch disregard > address // self }> types< constant variable ~ recurse 
+syn keyword stoical_binary add - / * mod /mod and or xor feq fne lt gt le ge + eq 
+syn keyword stoical_conditional mark? check +check -check { } (else) (if) {if {else (else) {ifelse if{ }else{ if else then 
+syn keyword stoical_compiler exit ^ eoc eol stack stack vocab decompile vstack rtn bye inspect prompt compile clearcst eval execc 
+syn keyword stoical_thread thread detach join me cancel delay shared 
+syn keyword stoical_array ]@ ]! ]push pop ]delete ]insert )@ )! )delete array hash ]? )? 
+syn keyword stoical_stack cells mark swap drop dup over nip tuck -rot +rot flip idup idrop <l l> <c c> .t retype [[ ]] l]] [ ] 
 syn keyword stoical_literal l() 
 syn keyword stoical_regex rs() r() 
+syn keyword stoical_source load include ;f 
+syn keyword stoical_var @ ! ? @@ 1+! 
+syn keyword stoical_system args[ system env> <env (env) 
+syn keyword stoical_io chdir mkdir rmdir unlink mkfifo umask open close write read writeln readln flush seek stat (get) (put) (getln) (putln) get put ttyput ttyget getln putln ttyputln ttygetln opendir closedir readdir socket bind listen accept connect shutdown sendfile frdline rdline = cr space spaces tab 
+syn keyword stoical_.. 
+syn keyword stoical_variables pad warnings current .c .l .r .v .d tib 
+syn keyword stoical_error errch abort 
+syn keyword stoical_dictionary (:) ({:) (:{) ):{ ():{) enter ({) (b{) (}) {}> (;) immediate (constant) fconstant (variable) ((variable)) definitions stoical< (branch) branch disregard > address // self }> types< constant variable ~ recurse 
+syn keyword stoical_constants true false 
+syn keyword stoical_iterative i j k redo ({do) ({loop) ({+loop) {loop {+loop ({() ({)) {( ()do) (){each) ){each {until {while break }until }while{ loop{ +loop{ )each{ ( ) begin end 
+syn keyword stoical_. 
 " Define some things better represented with regular expressions..
 " syn clear stoical_stack
 syn match stoical_dictionary '\<()[ \t]\+[^ \t]\+\>' oneline

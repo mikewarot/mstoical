@@ -48,9 +48,9 @@ interpolate( string *str, int mode )
 {
 	int len, i, j;
 	int c;
-	char *s;
+	char *s = str->s;
 
-	len = strlen(  ( s = &str->s ) );
+	len = strlen( s );
 
 	j = 0;
 	for (i = 1; i < len; i++ )
@@ -160,14 +160,14 @@ int st_word( string *tib, int *tibp, string *pad )
 	int eol = FALSE;
 	for (;;)
 	{
-		c = (&tib->s)[(*tibp)++];
+		c = (tib->s)[(*tibp)++];
 		if ( c != ' ' && c != '\t' )
 			break;
 	}
 	(*tibp)--;
 	for (;;) {
-		c = (&tib->s)[(*tibp)++]; 
-		(&pad->s)[len++] = c;
+		c = (tib->s)[(*tibp)++];
+		(pad->s)[len++] = c;
 		if ( c == '\0' )
 		{
 			eol = TRUE;
@@ -175,15 +175,15 @@ int st_word( string *tib, int *tibp, string *pad )
 		}
 		if ( c == delim[0] || c == delim[1] )
 		{
-			if ( (&tib->s)[*tibp - 2] != '\\' ) 
+			if ( (tib->s)[*tibp - 2] != '\\' )
 			{ 
-				if ( (&tib->s)[*tibp] == '\0' )
+				if ( (tib->s)[*tibp] == '\0' )
 					eol = TRUE;
 				break;
 			} 
 			else 
 			{ 
-				(&pad->s)[len - 2] = c; 
+				(pad->s)[len - 2] = c;
 				len--; 
 			} 
 		}
@@ -199,6 +199,6 @@ int st_word( string *tib, int *tibp, string *pad )
 		}
 	}
 	pad->l = --len;
-	(&pad->s)[len] = '\0';
+	(pad->s)[len] = '\0';
 	return eol;
 }

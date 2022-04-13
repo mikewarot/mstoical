@@ -86,11 +86,11 @@ begin(thread)
 	data->io	= malloc( sizeof( struct iopoint ) );
 	memcpy( data->io, io, sizeof( struct iopoint ) );
 	
-	pthread_create( &data->thread, NULL, (void*)st_start, data );
+	pthread_create( &data->thread, NULL, st_start, data );
 
-	printk("launching thread %i", (ub4)data->thread);
+	printk("launching thread %08lx", data->thread);
 
-	fpush(sst,(ub4)data->thread);
+	fpush(sst,data->thread);
 end()
 /**(thread) detach
  * "() foo thread DETACH"
@@ -98,7 +98,9 @@ end()
  * you cannot retrieve it's return value.
  */
 begin(detach)
-	pthread_detach( (pthread_t)((ub4)fpop(sst)) );
+	pthread_t thread = (pthread_t) fpop(sst);
+	printk("detaching thread %08lx\n", thread);
+	pthread_detach( thread );
 end()
 /**(thread) join
  * "() foo thread JOIN"
@@ -107,7 +109,9 @@ end()
  */
 begin(join)
 	void *status;
-	pthread_join( (pthread_t)((ub4)fpop(sst)), &status );
+	pthread_t thread = (pthread_t) fpop(sst);
+	printk("  joining thread %08lx\n", thread);
+	pthread_join( thread, &status );
 	fpush(sst,(long)status);
 end()
 /**(thread) me
@@ -320,13 +324,13 @@ begin(print)
 	eol = TRUE;
 
 	/* copy the remainder of the line into the pad */
-	memcpy( &pad->s, &tib->s + tibp, 1 + tib->l - tibp );
+	memcpy( pad->s, tib->s + tibp, 1 + tib->l - tibp );
 
 	/* set the length of the new pad and append a newline */
-	pad->l = strlen( &pad->s );
+	pad->l = strlen( pad->s );
 
-	(&pad->s)[pad->l]	= '\n';
-	(&pad->s)[++pad->l]	= '\0';
+	(pad->s)[pad->l]	= '\n';
+	(pad->s)[++pad->l]	= '\0';
 
 	/* push the address of pad, and call MSG */
 	spush(sst,pad);
@@ -370,9 +374,8 @@ end()
  * Perform floating point addition of TOS and TOS-1.
  */
 begin(add)
-	float v;
-	
-	v = fpop(sst) + fpop(sst);
+	double v = fpop(sst);
+	v += fpop(sst);
 		
 	fpush(sst,v);
 end()
@@ -381,9 +384,8 @@ end()
  * Subtract TOS from TOS-1.
  */
 begin(sub)
-	float v;
-
-	v = idx(sst,1).v.f - fpop(sst);
+	double v = idx(sst,1).v.f;
+	v -= fpop(sst);
 	drop(sst);
 	
 	fpush(sst,v);
@@ -393,9 +395,8 @@ end()
  * Perform floating point division of TOS-1 by TOS.
  */
 begin(div)
-	float v;
-
-	v = idx(sst,1).v.f / fpop(sst);
+	double v = idx(sst,1).v.f;
+	v /= fpop(sst);
 	drop(sst);
 
 	fpush(sst,v);
@@ -405,9 +406,8 @@ end()
  * Multiply TOS-1 by TOS.
  */
 begin(mul)
-	float v;
-
-	v = fpop(sst) * fpop(sst);
+	double v = fpop(sst);
+	v *= fpop(sst);
 
 	fpush(sst,v);
 end()
@@ -417,9 +417,8 @@ end()
  * return the remainder.
  */
 begin(mod)
-	float v;
-
-	v = (long)idx(sst,1).v.f % (long)fpop(sst);
+	long v = (long)idx(sst,1).v.f;
+	v %= (long)fpop(sst);
 	drop(sst);
 
 	fpush(sst,v);
@@ -429,7 +428,7 @@ end()
  * Integer divide. Leaves both quotient and remainer on stack.
  */ 
 begin(divmod)
-	float a, b;
+	double a, b;
 
 	b = fpop(sst);
 	a = fpop(sst);
@@ -439,7 +438,7 @@ begin(divmod)
 end()
 /**(unary) int
  * "( 1.3 - 1 )"
- * Round float at TOS to an integer value. Not very pretty, as the gritty bits
+ * Round double at TOS to an integer value. Not very pretty, as the gritty bits
  * are left to your specific C compiler. But, since I've been GCC-ific so far,
  * why stop now? FIXME: My name is pandora. This is my box.
  */
@@ -602,8 +601,8 @@ begin(bracket_bang)
 		/* source is a string. store a copy its value in the
 		 * word */
 		ptr->type = T_STR;
-		ptr->v.s = malloc( sizeof(string) + a.v.s->l + 2 );
-		memcpy( ptr->v.s, a.v.s, sizeof(string) + a.v.s->l + 2 );
+		ptr->v.s = malloc( sizeof(string) + a.v.s->l + 1 );
+		memcpy( ptr->v.s, a.v.s, sizeof(string) + a.v.s->l + 1 );
 	}
 	else
 		*ptr = a;
@@ -904,7 +903,8 @@ end()
  * Duplicate TOS-1.
  */
 begin(over)
-	push(sst,idx(sst,1));	
+	cell v = idx(sst,1);
+	push(sst,v);
 end()
 /**(stack) nip - (new)
  * "( a b - b )"
@@ -982,8 +982,8 @@ begin(idup)
 	int n;
 	
 	n = fpop(sst);
-
-	push(sst,*(sst - n));
+	cell v = *(sst - n);
+	push(sst,v);
 end()
 /**(stack) idrop - (new)
  * "( a b c 3 - b c )"
@@ -1036,8 +1036,8 @@ begin(cat)
 
 	s = gmalloc( sizeof(string) + len + 1, gstack, &gst );
 
-	memcpy( &s->s, &one->s, one->l );
-	memcpy( &s->s + one->l, &two->s, two->l + 1);
+	memcpy( s->s, one->s, one->l );
+	memcpy( s->s + one->l, two->s, two->l + 1);
 
 	s->l = len;
 	
@@ -1055,7 +1055,7 @@ begin(count)
 	string *s;
 
 	s = spop(sst);
-	ppush(sst,&s->s);
+	ppush(sst,s->s);
 	fpush(sst,s->l);
 end()
 /**(string) type
@@ -1082,7 +1082,7 @@ begin(stype)
 
 	n = gmalloc( sizeof(string) + len + 1, gstack, &gst );
 
-	memcpy( &n->s, s, len + 1 );
+	memcpy( n->s, s, len + 1 );
 
 	n->l = len;
 
@@ -1144,12 +1144,12 @@ begin(include)
 	l = strlen(libroot);
 	
 	/* create new string */
-	n = gmalloc( sizeof(string) + s->l + l + 1, gstack, &gst );
+	n = gmalloc( sizeof(string) + s->l + l + 2, gstack, &gst );
 
 	/* copy library root and filename into the new string */
-	memcpy( &n->s, libroot, l );
-	(&n->s)[l] = '/';
-	memcpy( &n->s + l + 1, &s->s, s->l + 1 );
+	memcpy( n->s, libroot, l );
+	(n->s)[l] = '/';
+	memcpy( n->s + l + 1, s->s, s->l + 1 );
 
 	spush(sst,n);
 
@@ -1337,7 +1337,7 @@ begin(writeln)
 	f = ppop(sst);
 	s = spop(sst);
 	
-	fpush(sst,fwrite( &s->s, 1, s->l, f->fp ));
+	fpush(sst,fwrite( s->s, 1, s->l, f->fp ));
 end()
 /**(io) readln
  * "handle READLN"
@@ -1359,18 +1359,18 @@ begin(readln)
 	 * buffer to accommodate. */
 	for (;;)
 	{
-		n = realloc( n, sizeof(string) + l + BUFSIZ );
+		n = realloc( n, sizeof(string) + l + BUFSIZ + 1 );
 		
 		/* setup overflow detector */
-		(&n->s)[ l + BUFSIZ ] = 'x';
+		(n->s)[ l + BUFSIZ ] = 'x';
 
-		if ( fgets( &n->s + l, BUFSIZ, f->fp ) == NULL )
+		if ( fgets( n->s + l, BUFSIZ, f->fp ) == NULL )
 		{
 			eof = 1;
 			break;
 		}
 
-		if ( (&n->s)[ l + BUFSIZ ] == 'x' )
+		if ( (n->s)[ l + BUFSIZ ] == 'x' )
 			/* didn't overflow. done. */
 				break;
 
@@ -1379,7 +1379,7 @@ begin(readln)
 
 	if ( ! eof ) {
 		/* resize and mark the string for collection */
-		n->l = strlen( &n->s );
+		n->l = strlen( n->s );
 		n = realloc( n, sizeof(string) + n->l + 1 );
 		n = gmark( n, gstack, &gst );
 
@@ -1448,7 +1448,7 @@ begin(stat)
 	int i;
 	
 	n = fpop(sst) + 1;
-	name = (char*)&(idx(sst,(n - 1)).v.s->s);
+	name = idx(sst,(n - 1)).v.s->s;
 
 	printk("stat'ing file %s", name );
 	
@@ -1495,7 +1495,7 @@ begin(stat)
 		
 		fpush(sst,TRUE);
 	}
- 	else 
+	else
 	{
 		/* discard filename */
 		drop(sst);
@@ -1651,8 +1651,8 @@ begin(readdir)
 
 		n = gmalloc( sizeof(string) + len + 1, gstack, &gst );
 		n->l = len;
-		memcpy( &n->s, ent->d_name, len );
-		(&n->s)[len] = '\0';
+		memcpy( n->s, ent->d_name, len );
+		(n->s)[len] = '\0';
 		
 		spush(sst,n);
 		fpush(sst,TRUE);
@@ -1688,10 +1688,10 @@ end()
 begin(socket)
 	int proto, type, domain, af, v;
 	struct protoent *p;
-	char *s = NULL;
+	char *s = scpop(sst);
 
 	/* Deduce protocol */
-	p = getprotobyname( scpop(sst) );
+	p = getprotobyname(s);
 	if ( p == NULL )
 		error("invalid socket protocol (%s)\n", s);
 
@@ -1837,7 +1837,8 @@ end()
  */
 begin(accept)
 	struct sockaddr_in sin;
-	int s, len;
+	int s;
+	socklen_t len;
 	t_sock *nsock;
 	t_sock *sock;
 
@@ -1925,7 +1926,8 @@ end()
  */
 begin(shutdown)
 	/* FIXME: When should I close this stream? */
-	shutdown(((t_file *)ppop(sst))->fd, fpop(sst));
+	int fd = ((t_file *)ppop(sst))->fd;
+	shutdown(fd, fpop(sst));
 end()
 #ifdef HAVE_SYS_SENDFILE_H
 /**(io) sendfile - (new)
@@ -1993,7 +1995,7 @@ begin(left_angle_hash)
 	hash_cnt.parm.type = T_FLT;
 	hash_cnt.parm.v.f = 0;
 	hash_ptr.parm.type = T_PTR;
-	hash_ptr.parm.v.p = &pad->s + 32;
+	hash_ptr.parm.v.p = pad->s + 32;
 end()
 begin(hash_right_angle)
 	/* Discard TOS. Push the contents of hash_ptr. Push the
@@ -2001,7 +2003,8 @@ begin(hash_right_angle)
 	drop(sst);
 
 	/* Set the length byte in the string */
-	*((char*)hash_ptr.parm.v.p - 1) = hash_cnt.parm.v.f;
+	unsigned char l = hash_cnt.parm.v.f;
+	memcpy(hash_ptr.parm.v.p - 1, &l, 1);
 	
 	push(sst,hash_ptr.parm);
 	push(sst,hash_cnt.parm);
@@ -2009,12 +2012,9 @@ end()
 begin(hash_put)
 	/* Place character represented by the value at TOS into
 	 * the buffer. Decrement the pointer, and increment the count. */
-/*
-	*(--(char*)hash_ptr.parm.v.p) = fpop(sst);
-*/
-	hash_ptr.parm.v.p -= 1;  
-	*((char*)hash_ptr.parm.v.p) = fpop(sst);
-
+	char v = fpop(sst);
+	hash_ptr.parm.v.p -= sizeof(char);
+	memcpy(hash_ptr.parm.v.p, &v, sizeof(char));
 	
 	hash_cnt.parm.v.f++;
 end()
@@ -2119,7 +2119,9 @@ end()
  * Test TOS and TOS-1 for equality.
  */
 begin(feq)
-	if ( fpop(sst) == fpop(sst) )
+	double v1 = fpop(sst);
+	double v2 = fpop(sst);
+	if ( v1 == v2 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2128,7 +2130,9 @@ end()
  * Compare two strings.
  */
 begin(dolar_eq)
-	if ( strcmp(&spop(sst)->s,&spop(sst)->s) == 0 )
+	char *s1 = spop(sst)->s;
+	char *s2 = spop(sst)->s;
+	if ( strcmp(s1,s2) == 0 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2138,7 +2142,9 @@ end()
  * Test TOS and TOS-1 for inequality.
  */
 begin(fne)
-	if ( fpop(sst) != fpop(sst) )
+	double  v1 = fpop(sst);
+	double  v2 = fpop(sst);
+	if ( v1 != v2 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2147,7 +2153,9 @@ end()
  * Compare two strings.
  */
 begin(dolar_ne)
-	if ( strcmp(&spop(sst)->s,&spop(sst)->s) != 0 )
+	char *s1 = spop(sst)->s;
+	char *s2 = spop(sst)->s;
+	if ( strcmp(s1,s2) != 0 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2157,7 +2165,9 @@ end()
  * TRUE if TOS-1 is less than TOS.
  */
 begin(lt)
-	if ( fpop(sst) > fpop(sst) )
+	double  v1 = fpop(sst);
+	double  v2 = fpop(sst);
+	if ( v1 > v2 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2167,7 +2177,9 @@ end()
  * TRUE if TOS-1 is greater than TOS.
  */
 begin(gt)
-	if ( fpop(sst) < fpop(sst) )
+	double  v1 = fpop(sst);
+	double  v2 = fpop(sst);
+	if ( v1 < v2 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2177,7 +2189,9 @@ end()
  * TRUE if TOS-1 is less than or equal to TOS.
  */
 begin(le)
-	if ( fpop(sst) >= fpop(sst) )
+	double  v1 = fpop(sst);
+	double  v2 = fpop(sst);
+	if ( v1 >= v2 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2187,7 +2201,9 @@ end()
  * TRUE if TOS-1 is greater than or equal to TOS.
  */
 begin(ge)
-	if ( fpop(sst) <= fpop(sst) )
+	double  v1 = fpop(sst);
+	double  v2 = fpop(sst);
+	if ( v1 <= v2 )
 		fpush(sst,TRUE);
 	else
 		fpush(sst,FALSE);
@@ -2372,7 +2388,7 @@ end()
  */
 begin(rtn)
 	printk("Goodbye, Dave.");
-	return;
+	return NULL;
 end()
 /**(compiler) bye
  * Exit the entire process. (with return value of zero);
@@ -2396,7 +2412,7 @@ begin(abort)
 	eol   = FALSE;
 	eoc   = TRUE;
 
-	strcpy( &tib->s, "(:) nop" );
+	strcpy( tib->s, "(:) nop" );
 	tib->l = 7;
 	tibp = 0;
 
@@ -2518,7 +2534,7 @@ end()
  * type-checking enabled.
  */
 begin(_paren_colon_brace)
-	int i, size, cols;
+	unsigned int i, size, cols;
 	ub4 type, mask;
 	struct code *c;
 	string *name;
@@ -2560,7 +2576,7 @@ begin(_paren_colon_brace)
 
 	name = spop(sst);
 
-	entry = stt_lookup(&name->s);
+	entry = stt_lookup(name->s);
 	
 	if ( entry == NULL || ! (entry->type & A_CHECK) )
 	{
@@ -2652,7 +2668,7 @@ begin(right_brace)
 
 	st_minus_check();
 
-	oldcst  = ppop(sst);
+	oldcst	= ppop(sst);
 
 	size = cst - oldcst;
 	
@@ -2790,14 +2806,11 @@ end()
  * and skip to the intruction following it. */
 begin(l_)
 	cell *a;
-	cell *b;
 
 	ip++;
 	a = (cell*)ip;
 
-	b = a;
-	b++;
-	ip = (cell*)b;
+	ip = (cell*)ip + 1;
 	ip--;
 
 	push(sst,*a);
@@ -2818,7 +2831,7 @@ end()
  * n	need not return the matches, just a boolean
  */
 begin(x)
-	int i;
+	unsigned int i;
 
 	word();
 	drop(sst);
@@ -2826,7 +2839,7 @@ begin(x)
 	re_flags = 0;
 	for ( i = 0; i < pad->l; i++ )
 	{
-		switch ( (&pad->s)[i] )
+		switch ( (pad->s)[i] )
 		{
 			case 'b': { re_flags &= ! REG_EXTENDED;	break; };
 			case 'i': { re_flags |= REG_ICASE;	break; };
@@ -2863,7 +2876,7 @@ begin(rs_)
 	r	= scpop(sst);
 	os	= spop(sst);
 	sl	= os->l;
-	s	= &os->s;
+	s	= os->s;
 	
 	sp = s;
 
@@ -2920,7 +2933,7 @@ begin(rs_)
 		 * for it. This will be extended automatically, if
 		 * insufficient. */
 		ns = malloc( sizeof(string) + (siz = sl + rl + 128) );
-		n = np = &ns->s; 
+		n = np = ns->s;
 	
 		for (;;)
 		{
@@ -2944,7 +2957,7 @@ begin(rs_)
 							      sizeof(string) +
 							      (siz += 128 +
 							      rl + p[0].rm_so) );
-						np = &ns->s;
+						np = ns->s;
 						n = np + ofs;
 					}
 					
@@ -2975,7 +2988,7 @@ begin(rs_)
 						      sizeof(string) +
 						      (siz += 128 +
 						      (sl - ( s - sp ))));
-					np = &ns->s;
+					np = ns->s;
 					n = np + ofs;
 				}
 				
@@ -3029,7 +3042,7 @@ begin(r_)
 
 	if ( regexec( reg, s, matches, p, 0 ) == 0 )
 	{
-	 	int i, c;
+		int i, c;
 		string *n;
 
 		if ( p[0].rm_so == -1 )
@@ -3049,10 +3062,10 @@ begin(r_)
 					n = gmalloc( sizeof(string) + 1 + len,
 							gstack, &gst );
 
-					memcpy( &n->s, &s[ p[i].rm_so ], len );
+					memcpy( n->s, &s[ p[i].rm_so ], len );
 					
 					n->l		= len;
-					(&n->s)[len]	= '\0';
+					(n->s)[len]	= '\0';
 					
 					spush(sst,n);
 				}
@@ -3067,7 +3080,7 @@ end()
 #endif
 	
 #define st_iliteral() {  \
-	float v; \
+	double v; \
 	char *s; \
 	char *end; \
  \
@@ -3328,16 +3341,16 @@ begin(branch)
 
 	n = malloc( sizeof(string) + s->l + 2 );
 
-	memcpy( &n->s, &s->s, s->l + 1 );
+	memcpy( n->s, s->s, s->l + 1 );
 
-	(&n->s)[ s->l ] = '<';
-	(&n->s)[ ++s->l ] = '\0';
+	(n->s)[ s->l ] = '<';
+	(n->s)[ ++s->l ] = '\0';
 	n->l = s->l;
 	
 	/* Create a vocabulary entry with the name "NAME"<
 	 * and with a value being a pointer to the new branch. */
 	
-	rpush(sst,voc_create(&n->s));
+	rpush(sst,voc_create(n->s));
 	spush(sst,n);
 	st_constant();
 
@@ -3359,7 +3372,7 @@ begin(disregard)
 	
 	s = spop(sst);
 
-	if ( ( entry = voc_lookup( current, s->l, &s->s ) ) != NULL )
+	if ( ( entry = voc_lookup( current, s->l, s->s ) ) != NULL )
 		entry_delete(current, entry);
 end()
 begin(badtype)
@@ -3367,7 +3380,7 @@ begin(badtype)
 end()
 begin(undefined)
 	printk("undefined");
-	printf("%s undefined\n", &pad->s );
+	printf("%s undefined\n", pad->s );
 	exec(*adr(abort));
 end()
 /**(io) frdline
@@ -3382,18 +3395,18 @@ begin(frdline)
 	eol = FALSE;
 	eoc = TRUE;
 
-	if ( fgets( &tib->s, KSIZE - 2, finput ) == NULL )
+	if ( fgets( tib->s, KSIZE - 2, finput ) == NULL )
 		/* eof - return control to the file
 		 * that loaded us (that's ;f's job) */
 		exec(*adr(semicolon_f));
 
-	len = strlen( &tib->s );
+	len = strlen( tib->s );
 	
 	if ( len >= KSIZE - 2 )
 		error("input buffer full");
 
 	tib->l = len;
-	(&tib->s)[len - 1] = '\0';
+	(tib->s)[len - 1] = '\0';
 	tibp = 0;
 end()
 /**(io) rdline
@@ -3416,10 +3429,10 @@ begin(rdline)
 
 	len = strlen(str);
 #else
-	fgets( &tib->s, KSIZE, stdin );
-	len = strlen( &tib->s );
+	fgets( tib->s, KSIZE, stdin );
+	len = strlen( tib->s );
 	/* remove the newline */
-	(&tib->s)[ --len ] = '\0';
+	(tib->s)[ --len ] = '\0';
 #endif
 
 	if ( len >= KSIZE - 1) 
@@ -3427,7 +3440,7 @@ begin(rdline)
 		
 #ifdef READLINE	
 	add_history( str );
-	strncpy( &tib->s, str, len + 1 );
+	strncpy( tib->s, str, len + 1 );
 	free(str);
 	}
 #endif
@@ -3465,7 +3478,7 @@ begin(_)
 	word();
 	drop(sst);
 
-	rpush(sst,stt_lookup(&pad->s));
+	rpush(sst,stt_lookup(pad->s));
 	st_lit();
 
 	if ( peek(cst) == NULL )
@@ -3480,7 +3493,7 @@ begin(ascii)
 	word();
 	drop(sst);
 
-	fpush(sst,*( &pad->s ));
+	fpush(sst,*( pad->s ));
 	st_lit();
 end()
 /**(dictionary) // - (*)
@@ -3531,7 +3544,8 @@ end()
  * Set type of TOS-1 to the value of TOS. 
  */
 begin(retype)
-	idx(sst,1).type = fpop(sst);
+	double tp = fpop(sst);
+	idx(sst,1).type = tp;
 end()
 /**(compiler) prompt
  * Display the compiler prompt on the output device.
@@ -3755,7 +3769,7 @@ end()
 begin(_right_bracket)
 	cell *oldsst;
 	oldsst = ppop(lst);
-	fpush(sst,(long)(sst - oldsst));
+	fpush(sst,(long)(sst - oldsst - 1));
 end()
 /**(stack) [ - (*)
  * Execute +check. Push the address of ([) onto the compile stack.
@@ -3827,7 +3841,7 @@ begin(_paren_brace_each)
 				
 				n = gmalloc( sizeof(string) + l + 1, gstack, &gst );
 				n->l = l;
-				memcpy( &n->s, s, l + 1 );
+				memcpy( n->s, s, l + 1 );
 
 				peek(lst).type	= T_STR;
 				peek(lst).v.s	= n;
@@ -3961,7 +3975,7 @@ begin(compile)
 		if ( pad->l < 1 )
 			break;
 		
-		if ( ( entry = stt_lookup( &pad->s ) ) != NULL )
+		if ( ( entry = stt_lookup( pad->s ) ) != NULL )
 		{	
 			/* Is a word */
 			if ( state || entry->type & A_IMM )
@@ -3982,17 +3996,17 @@ begin(compile)
 				push(cst,entry);
 			}
 		}
-		else if ( *( &pad->s ) == '\"' || *( &pad->s ) == '\'' )
+		else if ( pad->s[0] == '\"' || pad->s[0] == '\'' )
 		{
 			string *s;
-			printk("\tstring literal");
+			printk("\tstring literal '%s'", pad->s);
 			/* Literal - string */
 
 			/* Interpolate escape codes */
 			interpolate( pad, 0 );
 
 			s = stringdup( pad );
-
+			printk("Allocated %p '%s' %d", s, s->s, s->l);
 			/* push a pointer to the new string onto the compile
 			 * stack */
 			
@@ -4003,7 +4017,7 @@ begin(compile)
 			push(ccst,((ccell){ free, s }));
 		}
 #ifdef REGEX
-		else if ( *( &pad->s ) == '|' )
+		else if (  pad->s[0] == '|' )
 		{
 			int v;
 			regex_t *reg;
@@ -4013,10 +4027,11 @@ begin(compile)
 			/* interpolate escape sequences */
 			interpolate( pad, 1 );
 			
-			v = regcomp( reg, &pad->s,
+			v = regcomp( reg, pad->s,
 				     REG_EXTENDED ^ re_flags );
 							
 			/* FIXME: check for errors... */
+			(void) v;
 
 			if ( re_flags & REG_SUBST )
 			{
@@ -4095,7 +4110,7 @@ begin(env_right_angle)
 
 		n = gmalloc( sizeof(string) + len + 1, gstack, &gst );
 
-		memcpy( &n->s, s, len + 1 );
+		memcpy( n->s, s, len + 1 );
 		n->l = len;
 
 		spush(sst,n);
@@ -4112,7 +4127,9 @@ end()
  */
 begin(left_angle_env)
 	printk("setenv()");
-	setenv(scpop(sst), scpop(sst), 1); /* 1 means overwrite */
+	char *s1 = spop(sst)->s;
+	char *s2 = spop(sst)->s;
+	setenv(s1, s2, 1); /* 1 means overwrite */
 end()
 /**(compiler) eval
  * Execute STOICAL source code in string at TOS.
