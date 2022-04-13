@@ -1,4 +1,8 @@
-# Preface (2022)
+# Mike Warot - Preface (2022)
+
+I'm grateful for the assistance of Florian in helping this non-C expert get a hobby project up and running. I've pulled his latest version into this repository, since it works well enough to begin the long process of getting this code up to modern C programming standards.
+
+# Florian Hars - Preface (2022)
 
 This is an experiment in software archeology, someone on some orange
 forum nerdsniped me by asking what it would take to compile some
