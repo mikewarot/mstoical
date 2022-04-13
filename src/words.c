@@ -270,7 +270,9 @@ end()
  * Push the number of occupied parameter stack cells onto the stack.
  */
 begin(cells)
-	fpush(sst,(sst - sstmin));
+	int size;
+	size = sst - sstmin;
+	fpush(sst,size);
 end()
 /**(stack) mark
  * Leave a mark on the stack that is unique from any other object that
@@ -913,7 +915,9 @@ end()
  * Duplicate TOS-1.
  */
 begin(over)
-	push(sst,idx(sst,1));	
+	cell a;
+	a = idx(sst,1);
+	push(sst,a);
 end()
 /**(stack) nip - (new)
  * "( a b - b )"
@@ -989,10 +993,12 @@ end()
  */
 begin(idup)
 	int n;
+	cell a;
 	
 	n = fpop(sst);
+	a = *(sst - n);
 
-	push(sst,*(sst - n));
+	push(sst,a);
 end()
 /**(stack) idrop - (new)
  * "( a b c 3 - b c )"
