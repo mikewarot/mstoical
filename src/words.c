@@ -141,8 +141,8 @@ end()
 begin(delay)
 	struct timespec t;
 
-	t.tv_nsec = fpop(sst);
-	t.tv_sec  = fpop(sst);
+	t.tv_nsec = (long)ppop(sst);
+	t.tv_sec  = (time_t)ppop(sst);
 #ifdef PTHREAD_DELAY
 	pthread_delay_np(&t);
 #else
