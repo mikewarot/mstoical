@@ -90,7 +90,7 @@ begin(thread)
 
 	printk("launching thread %p", data->thread);
 
-	ppush(sst,data->thread); /* store the thread id in largest value type */
+	ppush(sst,(void*)data->thread); /* store the thread id in largest value type */
 end()
 /**(thread) detach
  * "() foo thread DETACH"
@@ -121,7 +121,7 @@ end()
 begin(me)
 	pthread_t tid;
 	tid = pthread_self();
-	ppush(sst,tid);
+	ppush(sst,(void*)tid);
 end()
 /**(thread) cancel
  * "me CANCEL"
