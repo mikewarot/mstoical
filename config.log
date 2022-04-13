@@ -648,8 +648,8 @@ configure:6270: $? = 0
 configure:6280: result: yes
 configure:6287: checking for _doprnt
 configure:6330: gcc -o conftest -g -O2   conftest.c -lm  >&5
-/usr/bin/ld: /tmp/ccEQ3ul1.o: in function `main':
-/home/mike/test/stoical/configure:6320: undefined reference to `_doprnt'
+/usr/bin/ld: /tmp/ccfq2ZZa.o: in function `main':
+/home/mike/stoical/configure:6320: undefined reference to `_doprnt'
 collect2: error: ld returned 1 exit status
 configure:6333: $? = 1
 configure: failed program was:
@@ -759,8 +759,8 @@ configure:6430: $? = 0
 configure:6440: result: yes
 configure:6378: checking for pthread_delay_np
 configure:6421: gcc -o conftest -g -O2   conftest.c -lm  >&5
-/usr/bin/ld: /tmp/cc1DXdiw.o: in function `main':
-/home/mike/test/stoical/configure:6411: undefined reference to `pthread_delay_np'
+/usr/bin/ld: /tmp/cc8zn4cE.o: in function `main':
+/home/mike/stoical/configure:6411: undefined reference to `pthread_delay_np'
 collect2: error: ld returned 1 exit status
 configure:6424: $? = 1
 configure: failed program was:
@@ -834,6 +834,7 @@ config.status:541: creating src/Makefile
 config.status:541: creating test/Makefile
 config.status:541: creating doc/stoical.1
 config.status:645: creating config.h
+config.status:840: config.h is unchanged
 configure:7468: result: 
 configure:7470: result: ----{ STOICAL 0.1.8
 configure:7472: result: CFLAGS	: -g -O2

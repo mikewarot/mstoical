@@ -1,4 +1,6 @@
 *.o
+*.log
 autom4te.cache/*
 stoical
 stoical.save
+
