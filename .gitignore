@@ -8,7 +8,7 @@
 .deps/
 .libs/
 
-# Generated Makefile 
+# Generated Makefile
 Makefile
 
 /bin/
@@ -16,6 +16,8 @@ Makefile
 /src/.depend
 
 /doc/stoical.1
+/doc/words
+/vim/syntax
 stoical
 
 # Build artifacts
