@@ -46,10 +46,10 @@ const char *a_types[] =
 
 /* st_start
  * This is the entry point for new threads. */
-void *
-st_start (void * vData)
+void
+st_start (struct thread_data *data)
 {
-struct thread_data *data = vData;
+
 struct vocabulary *voc;
 int i, count;
 struct voc_item item;
@@ -89,9 +89,9 @@ string *tib;
 int tibp = 0;
 
 /* Declare Instruction Pointer and friends */
-struct voc_entry **ip = NULL;		/* Instruction Pointer */
-struct voc_entry **go = NULL;		/* Initial Instruction Pointer */
- struct voc_entry *self= NULL;
+struct voc_entry **ip;		/* Instruction Pointer */
+struct voc_entry **go;		/* Initial Instruction Pointer */
+struct voc_entry *self;
 
 /* Current vocabulary. This is where new definitions go. As well as which
  * vocabulary DISREGARD and FORGET should apply to. */
@@ -115,21 +115,21 @@ FILE *toutput;
 /* variables exposed to the language */
 struct voc_entry hash_cnt;
 struct voc_entry hash_ptr;
- struct voc_entry input = {0};
+struct voc_entry input;
 
 struct voc_entry *line;
 
 struct voc_entry *args = NULL;
-struct voc_entry warnings =	{ .type = A_CONST, .parm =
-				{ .type = T_FLT, .v = { .f = TRUE } } };
-struct voc_entry radix	  =	{ .type = A_CONST, .parm =
-				{ .type = T_FLT, .v = { .f = 10 } } };
+struct voc_entry warnings =	{ type: A_CONST, parm:
+				{ type: T_FLT, v: { f: TRUE } } };
+struct voc_entry radix	  =	{ type: A_CONST, parm:
+				{ type: T_FLT, v: { f: 10 } } };
 struct iopoint *io;
 
 #ifdef REGEX
 /* maximum number of sub matches for regexps */
-struct voc_entry hash_match =	{ .type = A_CONST, .parm =
-				{ .type = T_FLT, .v = { .f = 10 } } };
+struct voc_entry hash_match =	{ type: A_CONST, parm:
+				{ type: T_FLT, v: { f: 10 } } };
 long re_flags = 0;
 #endif
 
@@ -216,7 +216,7 @@ if ( data->main )
 
 			s = a[i].v.s;
 			
-			strcpy( s->s, argv[i] );
+			strcpy( c_str(s), argv[i] );
 		}
 	}
 
@@ -276,9 +276,9 @@ if ( data->main )
 	
 	printk("Bootstrapping interactive compiler...");
 
-	strcpy(tib->s, "(:) 'def include" );
+	strcpy(c_str(tib), "(:) 'def include" );
 
-	tib->l = strlen(tib->s);
+	tib->l = strlen(c_str(tib));
 	tibp = 0;
 	eol = FALSE; eoc = TRUE;
 
@@ -348,7 +348,6 @@ exec(*adr(next));
 printk("Outer loop (NEXT) has returned, something is broken!");
 
 	}
-return NULL;
 }
 
 int main (int argc, char **argv)

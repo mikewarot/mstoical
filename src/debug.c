@@ -60,10 +60,10 @@ void st_pcell ( cell *a )
 	{
 		case T_STR:
 		{
-			if ( memchr( a->v.s->s, ' ', a->v.s->l ) == NULL )
-				fprintf(stderr, "\'%s ", a->v.s->s );
+			if ( memchr( c_str(a->v.s), ' ', a->v.s->l ) == NULL )
+				fprintf(stderr, "\'%s ", c_str(a->v.s) );
 			else
-				fprintf(stderr, "\"%s\" ", a->v.s->s );
+				fprintf(stderr, "\"%s\" ", c_str(a->v.s) );
 			break;
 		}
 		case T_REF:
@@ -139,7 +139,12 @@ void st_pword ( struct voc_entry *entry, struct voc_entry **high )
 		else if ( strcmp( (*p)->name, "l()" ) == 0 )
 		{
 			p++;
-			st_pcell( (cell*)p );
+			{
+				cell *c = (cell*)p;
+				st_pcell( c++ );
+				p = (struct voc_entry **)c;
+			}
+			p--;
 		}
 		else if ( strcmp( (*p)->name, "r()" ) == 0 ||
 			  strcmp( (*p)->name, "rs()" ) == 0 )

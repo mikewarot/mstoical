@@ -83,12 +83,12 @@ typedef unsigned char type_t;
 /* all strings on the stack will have this format. */
 typedef struct {
 	unsigned int l;	/* length of string */
-	char s[];		/* string itself */
+	char s;		/* string itself */
 } string;
 typedef void(function)();
 /* value portion of a stack cell */
 typedef union {
-	double f;
+	float f;
 	void *p;
 	string *s;
 } value;
@@ -166,14 +166,14 @@ typedef struct {
 
 /* Type specific stack operations. These are only for stacks
  * of cell's. (sstack and lstack) */
-#define spush(st,k) (*(st++) = (cell){ T_STR, { .s = k }})
-#define fpush(st,k) (*(st++) = (cell){ T_FLT, { .f = k }})
-#define ppush(st,k) (*(st++) = (cell){ T_PTR, { .p = k }})
-#define rpush(st,k) (*(st++) = (cell){ T_REF, { .p = k }})
-#define filpush(st,k) (*(st++) = (cell){ T_FIL, { .p = k }})
+#define spush(st,k) (*(st++) = (cell){ T_STR, { s: k }})
+#define fpush(st,k) (*(st++) = (cell){ T_FLT, { f: k }})
+#define ppush(st,k) (*(st++) = (cell){ T_PTR, { p: k }})
+#define rpush(st,k) (*(st++) = (cell){ T_REF, { p: k }})
+#define filpush(st,k) (*(st++) = (cell){ T_FIL, { p: k }})
 
 
-#define scpop(st) ( ((--st)->v.s->s) )
+#define scpop(st) ( &((--st)->v.s->s) )
 
 #define filpop(s) ((--s)->v.p)
 #define ppop(s) ((--s)->v.p)
@@ -194,7 +194,7 @@ typedef struct {
 
 #define stt_lookup(n)	dict_lookup(n,vst,vstmin)
 #define st_minus_check() if ( --depth < 0 ) error("syntax error\n")
-#define error(...)	({fprintf(stderr, __VA_ARGS__); diagnostic(); exec(*adr(abort));})
+#define error(args...)	({fprintf(stderr, args); diagnostic(); exec(*adr(abort));})
 
 /* take the cell ontop of the sstack and move it to the compile buffer. */
 #define st_lit()	({ \
@@ -206,7 +206,7 @@ typedef struct {
 #ifndef HAVE_STRTOF
 /* emulate strtof() */
 #	define strtof(s,nptr) ((*(nptr) = (s) + strspn((s),"-0123456789eE."))\
-				, atof((s)) )
+				, (float)atof((s)) )
 #endif
 
 	
@@ -345,6 +345,7 @@ void stack_mark( cell *stmin, cell *st, void **gstack, unsigned char *gst );
 
 /* string.c function prototypes */
 
+char *c_str(string *s);
 string* stringdup( string *s );
 void interpolate( string *str, int mode );
 int st_word( string *tib, int *tibp, string *pad );

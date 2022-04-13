@@ -19,8 +19,22 @@
 
 #include "kernel.h"
 
+#include <stddef.h>
+
+
 /* String manipulation routines. */
 
+
+/* return the C-string -- char* pointer to the string's data.
+ * Return the offset to the data from the string's base pointer,
+ * same way as it's malloc'ed.
+ * This gets around crashing on string overflow checks, as the compiler
+ * only can see the char member, not the allocated extra memory that follows.
+ */
+char *c_str(string *s)
+{
+	return (s != NULL ? (char*)s + offsetof(string, s) : NULL);
+}
 
 /* duplicate string. malloc is used to allocate memory for the new string. */
 string *stringdup ( string *s )
@@ -48,9 +62,9 @@ interpolate( string *str, int mode )
 {
 	int len, i, j;
 	int c;
-	char *s = str->s;
+	char *s;
 
-	len = strlen( s );
+	len = strlen(  ( s = c_str(str) ) );
 
 	j = 0;
 	for (i = 1; i < len; i++ )
@@ -138,7 +152,6 @@ interpolate( string *str, int mode )
 					break;
 				}
 			}
-			break;
 			default:
 			{
 				s[j++] = s[i];
@@ -161,14 +174,14 @@ int st_word( string *tib, int *tibp, string *pad )
 	int eol = FALSE;
 	for (;;)
 	{
-		c = (tib->s)[(*tibp)++];
+		c = (c_str(tib))[(*tibp)++];
 		if ( c != ' ' && c != '\t' )
 			break;
 	}
 	(*tibp)--;
 	for (;;) {
-		c = (tib->s)[(*tibp)++];
-		(pad->s)[len++] = c;
+		c = c_str(tib)[(*tibp)++];
+		c_str(pad)[len++] = c;
 		if ( c == '\0' )
 		{
 			eol = TRUE;
@@ -176,15 +189,15 @@ int st_word( string *tib, int *tibp, string *pad )
 		}
 		if ( c == delim[0] || c == delim[1] )
 		{
-			if ( (tib->s)[*tibp - 2] != '\\' )
+			if ( c_str(tib)[*tibp - 2] != '\\' )
 			{ 
-				if ( (tib->s)[*tibp] == '\0' )
+				if ( c_str(tib)[*tibp] == '\0' )
 					eol = TRUE;
 				break;
 			} 
 			else 
 			{ 
-				(pad->s)[len - 2] = c;
+				c_str(pad)[len - 2] = c;
 				len--; 
 			} 
 		}
@@ -200,6 +213,6 @@ int st_word( string *tib, int *tibp, string *pad )
 		}
 	}
 	pad->l = --len;
-	(pad->s)[len] = '\0';
+	c_str(pad)[len] = '\0';
 	return eol;
 }
