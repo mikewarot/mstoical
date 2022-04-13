@@ -88,9 +88,9 @@ begin(thread)
 	
 	pthread_create( &data->thread, NULL, (void*)st_start, data );
 
-	printk("launching thread %i", (ub4)data->thread);
+	printk("launching thread %p", data->thread);
 
-	fpush(sst,(ub4)data->thread);
+	ppush(sst,data->thread); /* store the thread id in largest value type */
 end()
 /**(thread) detach
  * "() foo thread DETACH"
@@ -98,7 +98,9 @@ end()
  * you cannot retrieve it's return value.
  */
 begin(detach)
-	pthread_detach( (pthread_t)((ub4)fpop(sst)) );
+	pthread_t tid;
+	tid = (pthread_t)ppop(sst);
+	pthread_detach( tid );
 end()
 /**(thread) join
  * "() foo thread JOIN"
@@ -107,7 +109,9 @@ end()
  */
 begin(join)
 	void *status;
-	pthread_join( (pthread_t)((ub4)fpop(sst)), &status );
+	pthread_t tid;
+	tid = (pthread_t)ppop(sst);
+	pthread_join( tid, &status );
 	fpush(sst,(long)status);
 end()
 /**(thread) me
@@ -115,14 +119,18 @@ end()
  * Push a reference to the calling thread onto the stack
  */
 begin(me)
-	fpush(sst,(ub4)pthread_self());
+	pthread_t tid;
+	tid = pthread_self();
+	ppush(sst,tid);
 end()
 /**(thread) cancel
  * "me CANCEL"
  * Cancel the thread referred to by TOS.
  */
 begin(cancel)
-	pthread_cancel( (pthread_t)((ub4)fpop(sst)) );
+	pthread_t tid;
+	tid = (pthread_t)ppop(sst);
+	pthread_cancel( tid );
 end()
 #endif
 /**(thread) delay
