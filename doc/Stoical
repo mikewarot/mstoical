@@ -232,7 +232,7 @@ one must bear in mind that a routine can only enter as many levels of recursion
 as the return stack is deep. This may change in the future. Below is an example
 of this type of recursion.
 
-	'factorial : dup 1 ne if dup 1- recurse * then ;
+	'factorial : dup 1 fne if dup 1- recurse * then ;
 
 3.2.2. Type-checking
 
