@@ -1857,7 +1857,8 @@ end()
  */
 begin(accept)
 	struct sockaddr_in sin;
-	int s, len;
+	socklen_t len;
+	int s;
 	t_sock *nsock;
 	t_sock *sock;
 
