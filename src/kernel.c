@@ -91,7 +91,7 @@ int tibp = 0;
 /* Declare Instruction Pointer and friends */
 struct voc_entry **ip;		/* Instruction Pointer */
 struct voc_entry **go;		/* Initial Instruction Pointer */
-struct voc_entry *self;
+struct voc_entry *self = NULL;
 
 /* Current vocabulary. This is where new definitions go. As well as which
  * vocabulary DISREGARD and FORGET should apply to. */
@@ -115,7 +115,8 @@ FILE *toutput;
 /* variables exposed to the language */
 struct voc_entry hash_cnt;
 struct voc_entry hash_ptr;
-struct voc_entry input;
+struct voc_entry input =	{ type: A_CONST, parm:
+				{ type: T_FIL, v: { p: NULL } } };
 
 struct voc_entry *line;
 
