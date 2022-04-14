@@ -1,4 +1,19 @@
 
+STOICAL - The Revivial - April 14, 2022
+(c) 2022 Michael Warot
+
+I've long been interested in Forth and variants. I came across STOICAL
+a few years ago, and tried a few times to get it working, with not much luck.
+Thanks to a tremendous wave of support from those who answered my questions
+at HackerNews, and went far beyond. We now have a viable program that I'll
+be working on for the forseable future.
+
+Current goals are
+  Code Cleanup / Bug Fixes
+  Documentation
+  Many working examples
+
+
 S  T  O  I  C  A  L					http://stoical.sf.net
 
 (c) 2002 Jonathan Moore Liles
