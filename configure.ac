@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(STOICAL, 0.1.8, wantingwaiting@users.sf.net)
+AC_INIT(STOICAL, 0.1.9, wantingwaiting@users.sf.net)
 AC_CONFIG_SRCDIR([src/dict.c])
 AC_CONFIG_HEADER([config.h])
 
