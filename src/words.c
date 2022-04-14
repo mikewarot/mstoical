@@ -401,7 +401,7 @@ begin(sub)
 	fpush(sst,(a - b));
 end()
 /**(binary) /
- * "10 5 / ( 5 )"
+ * "10 5 / ( 2 )"
  * Perform floating point division of TOS-1 by TOS.
  */
 begin(div)
