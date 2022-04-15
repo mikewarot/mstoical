@@ -2095,7 +2095,10 @@ end()
  * Negate each bit of TOS.
  */
 begin(not)
-	peek(sst).v.f = ! peek(sst).v.f;
+	if ( peek(sst).v.f == 0 )
+		peek(sst).v.f = TRUE;
+	else
+		peek(sst).v.f = ~((long)peek(sst).v.f);
 end()
 /**(binary) and
  * Perform bitwise AND on TOS and TOS-1.
