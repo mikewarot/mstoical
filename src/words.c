@@ -2825,6 +2825,16 @@ begin(l_)
 	ip = (struct voc_entry **)(a + 1);
 	ip--;
 
+	if ( a->type == T_STR )
+	{
+		string *s;
+		/* string must be copied and therefore protected
+		 * from the garbage collector. */
+
+		s = stringdup(a->v.s);
+		a->v.s = s;
+	}
+
 	push(sst,*a);
 end()
 #ifdef REGEX
