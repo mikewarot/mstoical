@@ -1,7 +1,7 @@
 .de Op
 .BR -\\$1
 ..
-.TH @PACKAGE_STRING@ "May 5 2002" "@PACKAGE_STRING@"
+.TH @PACKAGE_STRING@ "April 15 2022" "@PACKAGE_STRING@"
 .SH NAME
 stoical \- STack Oriented Interactive Compiler Adapted to Linux (/Apt to Life?)
 .SH SYNOPSIS

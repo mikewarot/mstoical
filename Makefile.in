@@ -34,9 +34,10 @@ test:
 install: all doc
 	install -s stoical $(PREFIX)/bin
 	mkdir -p $(LIBROOT); cp -R lib/* $(LIBROOT)
-	mkdir -p $(PREFIX)/share/doc/stoical
-	cp -R COPYING README doc/Stoical doc/words $(PREFIX)/share/doc/stoical
-	cp doc/stoical.1 $(PREFIX)/share/man/man1
+#	mkdir -p $(PREFIX)/share/doc/stoical
+#	cp -R COPYING README doc/Stoical doc/words $(PREFIX)/share/doc/stoical
+	gzip -c doc/stoical.1 > /usr/share/man/man1/stoical.1.gz
+#	cp doc/stoical.1 $(PREFIX)/share/man/man1
 
 clean:
 	rm -f stoical
