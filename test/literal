@@ -1,0 +1,27 @@
+#! ../stoical
+
+% Test literals
+
+'test load
+
+"Testing literals...\n" =
+
+% -----------------
+" f \t% Number literal\n" =
+1
+1 eq ok?
+1
+2
+2 eq over 1 eq ok? drop
+1.6
+1.6 eq ok?
+
+% -----------------
+" s \t% String literal\n" =
+'one
+'one eq ok?
+'one
+'two
+'two eq over 'one $eq ok? drop
+
+fail @ exit
