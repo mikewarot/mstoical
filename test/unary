@@ -50,15 +50,16 @@
 -3 bool true eq ok?
 
 % -----------------
-" not \t% Logical complement\n" =
+" not \t% Bitwise not\n" =
 false not true eq ok?
 true not false eq ok?
-0 not true eq ok?
-1 not false eq ok?
--1 not false eq ok?
-3 not false eq ok?
--3 not false eq ok?
-1.3 not false eq ok?
+0 not -1 eq ok?
+1 not -2 eq ok?
+-1 not 0 eq ok?
+3 not -4 eq ok?
+-3 not 2 eq ok?
+-1.3 not 0 eq ok?
+-3.3 not 2 eq ok?
 
 % -----------------
 " eqz \t% Is equal to 0\n" =
