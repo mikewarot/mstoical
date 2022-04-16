@@ -52,7 +52,8 @@ void sig_init ( void )
 
 	act.sa_sigaction = sig_segv_h;
 	act.sa_flags	 = SA_SIGINFO;
-	
+	sigemptyset(&(act.sa_mask));
+
 	sigaction( SIGSEGV, &act, NULL ); 
 }
 
