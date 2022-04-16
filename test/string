@@ -1,0 +1,61 @@
+#! ../stoical
+
+% Test strings
+
+'test load
+
+"Testing strings...\n" =
+
+% -----------------
+" msg \t% Print\n" =
+% true ok?
+
+% -----------------
+" $eq \t% Is equal\n" =
+'a 'a $eq true eq ok?
+'one 'one $eq true eq ok?
+'One 'one $eq false eq ok?
+'ONE 'one $eq false eq ok?
+
+% -----------------
+" $eq \t% Is not equal\n" =
+'one 'notone $ne true eq ok?
+'one 'one $ne false eq ok?
+
+% -----------------
+" cat \t% Concatenation\n" =
+'one 'two cat 'onetwo eq ok?
+'one 'two 'three cat cat 'onetwothree eq ok?
+
+% -----------------
+" count \t% String length and pointer\n" =
+'one count 3 eq ok?
+"!not tested: count % test the presence of pointer at TOS-1\n" =
+
+% -----------------
+" type \t% Print string from its count\n" =
+"!not tested: type % test printed output at TOS\n" =
+
+% -----------------
+" stype \t% Recreate string from its count\n" =
+'one count stype 'one eq ok?
+
+% -----------------
+" iliteral \t% String to number\n" =
+'42 iliteral true eq over 42 eq ok? drop
+'1.23 iliteral true eq over 1.23 eq ok? drop
+'abc iliteral false eq ok?
+
+% -----------------
+" word \t% Next word\n" =
+word "abc" 'abc eq eq ok?
+word "  abc" "  abc" eq eq ok?
+"!not tested: word % leading whitespace stripping\n" =
+
+% -----------------
+" ascii \t% Next ASCII char\n" =
+ascii * 42 eq ok?
+ascii 1 49 eq ok?
+ascii 123 49 eq ok?
+
+fail @ exit
