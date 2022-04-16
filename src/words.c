@@ -2353,7 +2353,13 @@ begin(vocab)
 	struct vocabulary *voc;
 	struct voc_entry *entry;
 
+	i = vst - vstmin - 1;
+
+	printf("%s\n", idx(vst,i)->name );
+
 	voc = peek(vst);
+
+	voc = idx(vst,i);   /* worth a shot */
 	entry = voc->last;
 	
 	printf("Contents of vocabulary %s (%i words):\n",
