@@ -25,3 +25,6 @@ stoical
 *.a
 *.lo
 *.la
+
+# Not sure where this comes from yet...
+autom4te.cache/
