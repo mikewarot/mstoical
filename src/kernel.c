@@ -80,7 +80,7 @@ struct voc_entry ***bstmin	= &bstack[4];
 rcell *rst			= &rstack[4];
 rcell *rstmin			= &rstack[4];
 ccell *ccstmin			= &ccstack[4];
-unsigned char gst;
+unsigned char gst		= 0;
 
 
 /* Declare keyboard buffer and scratch pad space */
