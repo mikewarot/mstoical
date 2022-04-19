@@ -1049,7 +1049,10 @@ begin(cat)
 	string *s;
 	string *one;
 	string *two;
-	
+
+	if ( peek(sst).type != T_STR || idx(sst,1).type != T_STR )
+		exec(*adr(badtype));
+
 	two = spop(sst);
 	one = spop(sst);
 	len = one->l + two->l;
