@@ -1,0 +1,14 @@
+#! ../stoical
+
+% Test constants
+
+'test load
+
+"Testing constants...\n" =
+
+% -----------------
+"  \t% Pre-defined constants\n" =
+true -1 eq ok?
+false 0 eq ok?
+
+fail @ exit
