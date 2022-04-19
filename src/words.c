@@ -2383,6 +2383,9 @@ end()
  * Print a source version of the word addressed by TOS.
  */
 begin(decompile)
+	if ( peek(sst).type != T_REF )
+		error("invalid address pointer\n");
+
 	st_decompile( ppop(sst), NULL );
 end()
 /**(compiler) vstack (new)
