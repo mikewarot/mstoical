@@ -136,7 +136,7 @@ entry_free( struct voc_entry *entry )
 	/* collect collectables */
 	for ( ; entry->collectables; entry->collectables-- )
 	{
-		col = entry->collectable[ entry->collectables ];
+		col = entry->collectable[ entry->collectables - 1 ];
 
 		(col.handler)(col.ptr);
 	}

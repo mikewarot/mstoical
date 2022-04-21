@@ -2475,6 +2475,8 @@ end()
 	char *name; \
 	struct voc_item item; \
 	printk("enter()"); \
+	if ( peek(sst).type != T_STR ) \
+		error("invalid entry name\n"); \
 	name = scpop(sst); \
 	if ( warnings.parm.v.f != FALSE && stt_lookup(name) != NULL ) \
 		printf("redefining %s\n", name); \
