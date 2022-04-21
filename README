@@ -1,6 +1,14 @@
 
-STOICAL - The Revivial - April 14, 2022
+MSTOICAL - April 21, 2022
 (c) 2022 Michael Warot
+
+This is a fork of Stoical, which I found at http://stoical.sourceforge.net/
+
+I hope to adequately honor the gift which was given.
+
+When I came across Stoical, I thought that it might offer a route around the dead end that I often saw in Forth implementations. Usually you get to the point where you need to work with non-trivial data structures, and the limitations of the cell based stack become a brick wall. By adding types and some fairly substatial data structures, those inadequacies of Forth should be overcome.
+
+It is my belief that MSTOICAL will eventually be able to mirror the capabilities of Lisp, with slightly fewer parenthesis.
 
 I've long been interested in Forth and variants. I came across STOICAL
 a few years ago, and tried a few times to get it working, with not much luck.
@@ -9,9 +17,12 @@ at HackerNews, and went far beyond. We now have a viable program that I'll
 be working on for the forseable future.
 
 Current goals are
+  Fixup everything to use new name
+  remove Debian package folder stuff (that I don't understand)
   Code Cleanup / Bug Fixes
   Documentation
   Many working examples
+  
 
 
 S  T  O  I  C  A  L					http://stoical.sf.net
