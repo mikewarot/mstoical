@@ -3351,6 +3351,11 @@ begin(definitions)
 end()
 /**(dictionary) mstoical< (*)
  * Push a pointer to the MSTOICAL kernel vocabulary onto the vocabulary stack.
+
+   Note: This immediately alters the vocabulary
+ */
+/**(dictionary) mstoical (*)
+ * Push a pointer to the MSTOICAL kernel vocabulary onto the vocabulary stack at runtime
  */
 begin(mstoical)
 	push(vst,mstoical);
@@ -3481,6 +3486,10 @@ begin(rdline)
 end()
 /**(dictionary) > - (*)
  * Pop off the top of the vocabulary stack.
+     Note: this happens immediately during compile time
+ */
+/**(dictionary) v> - (*)
+ * Pop off the top of the vocabulary stack at run time
  */
 begin(right_angle)
 	drop(vst);

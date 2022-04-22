@@ -37,6 +37,7 @@ struct voc_item builtins[] = {
 { A_WRD,"env>", adr(env_right_angle) },
 
 { A_IMM,"mstoical<",adr(mstoical) },
+{ A_WRD,"mstoical",adr(mstoical) },
 { A_WRD,"+check", adr(plus_check) },
 { A_WRD,"-check", adr(minus_check) },
 
@@ -279,6 +280,7 @@ struct voc_item builtins[] = {
 { A_IMM,"]",	adr(right_bracket) },
 
 { A_IMM,">",	adr(right_angle) },
+{ A_WRD,"v>",	adr(right_angle) },
 { A_WRD,"<l",	adr(left_angle_l) },
 { A_WRD,"l>",	adr(l_right_angle) },
 { A_WRD,"<c",	adr(left_angle_c) },
