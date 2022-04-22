@@ -1,19 +1,19 @@
-
-/* STOICAL
- * Copyright (C) 2002 Jonathan Moore Liles. <wantingwaiting@users.sf.net>
+/* MSTOICAL
+ * Copyright (C) 2022 Mike Warot<chezmike@gmail.com>
+ * Copyright (C) 2002 Jonathan Moore Liles. 
  *
- * STOICAL is free software; you can redistribute it and/or modify it
+ * MSTOICAL is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 2 of the License, or (at your
  * option) any later version.
  *
- * STOICAL is distributed in the hope that it will be useful, but WITHOUT
+ * MSTOICAL is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with STOICAL; see the file COPYING.  If not,write to the Free Software
+ * with MSTOICAL; see the file COPYING.  If not,write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
@@ -36,7 +36,7 @@ struct voc_item builtins[] = {
 { A_WRD,"<env", adr(left_angle_env) },
 { A_WRD,"env>", adr(env_right_angle) },
 
-{ A_IMM,"stoical<",adr(stoical) },
+{ A_IMM,"mstoical<",adr(mstoical) },
 { A_WRD,"+check", adr(plus_check) },
 { A_WRD,"-check", adr(minus_check) },
 

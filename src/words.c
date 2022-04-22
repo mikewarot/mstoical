@@ -1,19 +1,20 @@
 
-/* STOICAL
- * Copyright (C) 2002 Jonathan Moore Liles. <wantingwaiting@users.sf.net>
+/* MSTOICAL
+ * Copyright (C) 2022 Mike Warot <chezmike@gmail.com>
+ * Copyright (C) 2002 Jonathan Moore Liles.
  * 
- * STOICAL is free software; you can redistribute it and/or modify it
+ * MSTOICAL is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 2 of the License, or (at your
  * option) any later version.
  * 
- * STOICAL is distributed in the hope that it will be useful, but WITHOUT
+ * MSTOICAL is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
  * 
  * You should have received a copy of the GNU General Public License along
- * with STOICAL; see the file COPYING.  If not,write to the Free Software
+ * with MSTOICAL; see the file COPYING.  If not,write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
  */
 
@@ -39,7 +40,7 @@
 /*** iterative		Words for constructing iterations */
 /*** conditional	Words for constructing conditionals */
 /*** literal		Literal handling words */
-/*** source		Words that change how STOICAL sees program source */
+/*** source		Words that change how MSTOICAL sees program source */
 /*** dictionary		Dictionary manipulation words */
 /*** io			Input / Output words */
 /*** error		Error handling words */
@@ -183,7 +184,7 @@ end()
 	\
 	if ( vst == vstmin ) \
 	{ \
-		push(vst,stoical); \
+		push(vst,mstoical); \
 		error("vocabulary stack empty\n"); \
 	} \
 	else if ( vst > vstmin + SSIZE ) \
@@ -313,7 +314,7 @@ begin(circumflex)
 	eoc = FALSE;
 end()
 /**(compiler) % and #! (*)
- * "#! /usr/bin/stoical"
+ * "#! /usr/bin/mstoical"
  * Set the end-of-line flag to true. This causes the remainder of the
  * line to be ignored and discarded. Used for comments.
  */
@@ -1133,7 +1134,7 @@ begin(msg)
 end()
 /**(source) load
  * "'filename load"
- * Transfer execution to the STOICAL source file named by TOS. Internally,
+ * Transfer execution to the MSTOICAL source file named by TOS. Internally,
  * load will the current input file pointer, rdline Code Address, and prompt
  * CA on the loop stack, and then begin executing the file named by TOS.
  */
@@ -1155,8 +1156,8 @@ begin(load)
 end()
 /**(source) include
  * "'filename include"
- * This is the same as load, with the filename being relative to the stoical
- * library root. (/usr/local/lib/stoical/)
+ * This is the same as load, with the filename being relative to the mstoical
+ * library root. (/usr/local/lib/mstoical/)
  */
 begin(include)
 	string *s;
@@ -2087,7 +2088,7 @@ end()
  * "3 bool not if"
  * Convert TOS to TRUE either FALSE. This word is used in situations where
  * you would like to use AND/OR/NOT in their logical capacity, but the value
- * you are working with may never be TRUE in the stoical sense.
+ * you are working with may never be TRUE in the mstoical sense.
  */
 begin(bool)
 	if ( peek(sst).v.f != 0 )
@@ -2247,7 +2248,7 @@ end()
 /**(unary) -i 
  * "4 ( -i = )"
  * Push TOS-2 + TOS-1 - TOS - 1 of the loopstack. The effect of this is an
- * index like i, but moving in the other direction. In STOICAL, -i can be used
+ * index like i, but moving in the other direction. In MSTOICAL, -i can be used
  * from with in parenthesis loops, where in STOIC this was erroneous.
  * Note: STOIC calls this i' (i prime). I think -i makes the word's function
  * more obvious. 
@@ -2328,7 +2329,7 @@ end()
  * Return a pointer to the bare memory portion of the scratch PAD area.
  * 
  * The original STOIC would return a pointer to the end of the dictionary;
- * Usually using it as a temporary space. However, in STOICAL there is no such
+ * Usually using it as a temporary space. However, in MSTOICAL there is no such
  * space.
  */
 begin(dot_d)
@@ -3320,7 +3321,7 @@ end()
 /**(thread) shared - (new)
  * "'foo 'bar variable shared"
  * Declare the most recently defined word to be shared among threads.  This
- * means that STOICAL will serialize access to it in a 'one writer, many
+ * means that MSTOICAL will serialize access to it in a 'one writer, many
  * readers' fashion.
  */
 begin(shared)
@@ -3348,11 +3349,11 @@ end()
 begin(definitions)
 	current = peek(vst);
 end()
-/**(dictionary) stoical< (*)
- * Push a pointer to the STOICAL kernel vocabulary onto the vocabulary stack.
+/**(dictionary) mstoical< (*)
+ * Push a pointer to the MSTOICAL kernel vocabulary onto the vocabulary stack.
  */
-begin(stoical)
-	push(vst,stoical);
+begin(mstoical)
+	push(vst,mstoical);
 end()
 /**(dictionary) (branch) - (new)
  * Push the pointer stored in the calling word's parameter field onto
@@ -4165,7 +4166,7 @@ begin(left_angle_env)
 	setenv(name, val, 1); /* 1 means overwrite */
 end()
 /**(compiler) eval
- * Execute STOICAL source code in string at TOS.
+ * Execute MSTOICAL source code in string at TOS.
  */
 begin(eval)
 	/* FIXME: There are numerous promlems with this setup. Just one being

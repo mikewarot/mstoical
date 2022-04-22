@@ -1,19 +1,20 @@
 
-/* STOICAL
- * Copyright (C) 2002 Jonathan Moore Liles. <wantingwaiting@users.sf.net>
+/* MSTOICAL
+ * Copyright (C) 2022 Mike Warot <chezmike@gmail.com>
+ * Copyright (C) 2002 Jonathan Moore Liles.
  * 
- * STOICAL is free software; you can redistribute it and/or modify it
+ * MSTOICAL is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 2 of the License, or (at your
  * option) any later version.
  * 
- * STOICAL is distributed in the hope that it will be useful, but WITHOUT
+ * MSTOICAL is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
  * 
  * You should have received a copy of the GNU General Public License along
- * with STOICAL; see the file COPYING.  If not,write to the Free Software
+ * with MSTOICAL; see the file COPYING.  If not,write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
  */
 
@@ -32,7 +33,7 @@ struct thread_data *mdata;
 #endif
 
 
-struct vocabulary *stoical;
+struct vocabulary *mstoical;
 char *libroot;
 
 /* Ascii names for cell types */
@@ -230,11 +231,11 @@ if ( data->main )
 
 	setvbuf(stdout, (char *)NULL, _IONBF, 0); 
 	
-	voc = voc_create("stoical<");
+	voc = voc_create("mstoical<");
 
-	stoical = voc; 
+	mstoical = voc; 
 	
-	printk("Building STOICAL vocabulary...");
+	printk("Building MSTOICAL vocabulary...");
 
 	i = 0;
 	while ( builtins[i].code != NULL ) 
@@ -265,14 +266,14 @@ if ( data->main )
 		if ( ( finput = fopen( argv[1], "r" ) ) == NULL )
 		{
 			fprintf(stderr, 
-			"stoical: could not open input file!\n");
+			"mstoical: could not open input file!\n");
 			exit(1);
 		}
 		stt_lookup("rdline")->code = adr(frdline);
 		stt_lookup("prompt")->code = adr(next);
 	}
 	else
-		puts("Welcome to Stoical.");
+		puts("Welcome to mstoical.");
 	
 	
 	printk("Bootstrapping interactive compiler...");

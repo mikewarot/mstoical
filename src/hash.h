@@ -3,7 +3,7 @@ struct hash_cell_s {
 	char *key;		/* this cell's ascii key ( name ) */
 	ub4 hash;		/* the hashed value of that key */
 	struct hash_cell_s *next;/* fellow behind us in the queue. */
-	cell c;		 	/* our hashes contain STOICAL cells (which may
+	cell c;		 	/* our hashes contain MSTOICAL cells (which may
 				   point elsewhere. */
 };
 typedef struct hash_cell_s hash_cell;

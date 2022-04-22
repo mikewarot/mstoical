@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(STOICAL, 0.1.9, wantingwaiting@users.sf.net)
+AC_INIT(MSTOICAL, 1.0.0, chezmike@gmail.com)
 AC_CONFIG_SRCDIR([src/dict.c])
 AC_CONFIG_HEADER([config.h])
 
@@ -77,7 +77,7 @@ AC_CHECK_FUNCS([gethostbyname memchr memmove mkdir regcomp rmdir setenv socket s
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  test/Makefile
-		 doc/stoical.1])
+		 doc/mstoical.1])
 AC_OUTPUT
 
 dnl sumarize configuration 

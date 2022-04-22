@@ -1,7 +1,7 @@
-#! /usr/local/bin/stoical
+#! /usr/local/bin/mstoical
 
 % This file contains high-level definitions to be automatically loaded by
-% STOICAL at startup. Documentation is automatically generated from the
+% MSTOICAL at startup. Documentation is automatically generated from the
 % comments herein, so their format must be adhered to.
 
 radix @ warnings @ false warnings ! 10 radix !

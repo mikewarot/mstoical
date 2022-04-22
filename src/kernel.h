@@ -1,19 +1,19 @@
-
-/* STOICAL
- * Copyright (C) 2002 Jonathan Moore Liles. <wantingwaiting@users.sf.net>
+/* MSTOICAL
+ * Copyright (C) 2022 Mike Warot <chezmike@gmail.com>
+ * Copyright (C) 2002 Jonathan Moore Liles.
  * 
- * STOICAL is free software; you can redistribute it and/or modify it
+ * MSTOICAL is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 2 of the License, or (at your
  * option) any later version.
  * 
- * STOICAL is distributed in the hope that it will be useful, but WITHOUT
+ * MSTOICAL is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
  * 
  * You should have received a copy of the GNU General Public License along
- * with STOICAL; see the file COPYING.  If not,write to the Free Software
+ * with MSTOICAL; see the file COPYING.  If not,write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
  */
 
@@ -54,7 +54,7 @@
 #ifdef REGEX
 /* regular expressions */
 #	include <regex.h>
-	/* fake reg options that only have meaning to STOICAL */
+	/* fake reg options that only have meaning to MSTOICAL */
 #	define REG_SUBST	(1 << 16)
 #	define REG_GLOBAL	(1 << 17)
 #endif
@@ -72,7 +72,7 @@
 #define NSIZE   40
 #define KSIZE   256
 
-/* redefine true and false as they apply to STOICAL. */
+/* redefine true and false as they apply to MSTOICAL. */
 #undef TRUE
 #undef FALSE
 #define TRUE	-1
@@ -237,7 +237,7 @@ struct voc_entry {
 	int collectables;	/* length of collectable array */
 	ccell *collectable;	/* array of pointers and destructors */
 	struct voc_entry *last;
-	/* Dictionaries are doubly linked in STOICAL to support
+	/* Dictionaries are doubly linked in MSTOICAL to support
 	 * the simple removal of individual entries. */
 	struct voc_entry *next;
 	cell parm;		/* parameter field, will be extended later */
