@@ -1,5 +1,4 @@
-
-Above and beyond the grace and efficiency of its syntax, STOICAL
+Above and beyond the grace and efficiency of its syntax, MSTOICAL
 provides several additional features that make it a truly powerful
 tool in any programmer's arsenal. Among these are:
 
@@ -14,13 +13,13 @@ Extensibility.
 	define additional functions or procedures in C, you cannot
 	extend the language itself. The syntax and operators are fixed
 	and unyielding. In an extensible language, however, all of these
-	things are liquid, and may be altered at any time. In STOICAL,
+	things are liquid, and may be altered at any time. In MSTOICAL,
 	the programmer may define his program as a little language
 	in its own right.	
 
 Interactivity.
 
-	STOICAL, like its predecessor, is completely interactive.
+	MSTOICAL, like its predecessor, is completely interactive.
 	It incrementally compiles and executes instructions and
 	definitions as you enter them. This allows for easy testing
 	and development of applications. And because of its speed you
@@ -33,7 +32,7 @@ Cooperation
 	own operating system*. This is foolish. I like my operating system,
 	and I like other computer languages. Moreover, I like them all to
 	interact in an intelligent and useful way. It is for this reason that
-	STOICAL strives to exploit the operating system and environment
+	MSTOICAL strives to exploit the operating system and environment
 	in any way that it can.
 
 	* - The most notable exception being Jason Evans and his Onyx
@@ -44,7 +43,7 @@ Networking.
 	For the past 10 years a large percentage of computer programs have
 	had to deal with the interconnection of systems in some way.
 	Currently, nearly every application must deal with the extreme
-	interconnection known as the Internet. To facilitate this, STOICAL
+	interconnection known as the Internet. To facilitate this, MSTOICAL
 	supports socket based networking in a straight forward, familiar
 	and empowering fashion.
 	
@@ -52,15 +51,15 @@ POSIX Threading.
 
 	Obviously, networking isn't of much use without concurrency of
 	some kind, and threads are the best form of concurrency made 
-	available by the operating system. STOICAL makes handling
+	available by the operating system. MSTOICAL makes handling
 	multiplicity uncommonly simple.
 
 POSIX Regular Expressions.
 
-	STOICAL integrates support for the POSIX Regular Expression
+	MSTOICAL integrates support for the POSIX Regular Expression
 	(regex) pattern matching facility, a truly striking feature for a
 	stack based language. In fact, regex's are more integrated with
-	STOICAL than they are with languages specially designed for them,
+	MSTOICAL than they are with languages specially designed for them,
 	such as Perl.
 
 Associative Arrays (Hash Tables).
@@ -69,7 +68,7 @@ Associative Arrays (Hash Tables).
 	Associative arrays are one of those features that most languages never
 	provide, even though you really must have them to write anything of
 	consequence. Oddly, almost all modern compilers use associative arrays
-	internally, to store their symbol table data. In any event, STOICAL
+	internally, to store their symbol table data. In any event, MSTOICAL
 	integrates hash table based associative arrays seamlessly with the
 	language; Another ground breaking feature in the world of RPN.
 
@@ -108,7 +107,7 @@ Passive Type-checking.
 Floating Point Arithmetic.
 
 	Anyone who has used a Forth system in the past knows what a headache
-	it can be to do floating point calculations. In STOICAL, this is
+	it can be to do floating point calculations. In MSTOICAL, this is
 	completely transparent, as floats and integers occupy the same
 	stack and behave identically.
 

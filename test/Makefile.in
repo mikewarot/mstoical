@@ -1,4 +1,4 @@
-BIN= ../stoical -l ../lib
+BIN= ../mstoical -l ../lib
 
 all: string constant array hash thread literal unary binary
 

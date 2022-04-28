@@ -1,4 +1,4 @@
-#! /usr/local/bin/stoical
+#! /usr/local/bin/mstoical
 
 % These were the place-holder associative array routines from before hashes
 % had actually been implemented. May you find them useful.
