@@ -21,8 +21,12 @@ Current goals are
   Code Cleanup / Bug Fixes
   Documentation
   Many working examples
-  
 
+Note: If you install mstoical and find that backspace doesn't worrk correctly, you need to install readline, then run ./configure again, and reinstall
+
+  sudo apt-get install libreadline-dev
+  ./configure
+  sudo make install
 
 S  T  O  I  C  A  L					http://stoical.sf.net
 
