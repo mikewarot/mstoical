@@ -134,33 +134,6 @@ begin(cancel)
 	pthread_cancel( tid );
 end()
 #endif
-/**(thread) delay
- * "1 0 delay"
- * Delay calling thread (not entire process) for TOS-1 seconds and TOS
- * nanoseconds.
- */
-begin(delay)
-	struct timespec t;
-
-	t.tv_nsec = (long)ppop(sst);
-	t.tv_sec  = (time_t)ppop(sst);
-#ifdef PTHREAD_DELAY
-	pthread_delay_np(&t);
-#else
-#	ifdef HAVE_PSELECT
-	pselect(0, NULL, NULL, NULL, &t, NULL);
-#	else
-	{
-		struct timeval tv;
-
-		tv.tv_sec  = t.tv_sec;
-		tv.tv_usec = t.tv_nsec > 0 ? t.tv_nsec / 1000 : 0;
-
-		select(0, NULL, NULL, NULL, &tv);
-	}
-#	endif	
-#endif
-end()
 /**(compiler) exit
  * Exit thread. Calling exit from the main thread, or with threads disabled,
  * causes program termination. 
@@ -1148,8 +1121,13 @@ begin(load)
 	ppush(lst,rdline->code);
 	ppush(lst,prompt->code);
 
-	if ( ( finput = fopen( scpop(sst), "r" ) ) == NULL )
-		error("file not found\n");
+    char* filename;
+	filename = scpop(sst);
+	
+	printf("Load(%s)\n",filename);
+
+	if ( ( finput = fopen( filename, "r" ) ) == NULL )
+		error("file not found: %s\n",filename);
 	
 	rdline->code = adr(frdline);
 	prompt->code = adr(next);
@@ -1160,22 +1138,24 @@ end()
  * library root. (/usr/local/lib/mstoical/)
  */
 begin(include)
-	string *s;
-	string *n;
+	string *sourcename;
+	string *newname;
 	int l;
-	s = spop(sst);
+	sourcename = spop(sst);
 
 	l = strlen(libroot);
 	
 	/* create new string */
-	n = gmalloc( sizeof(string) + s->l + l + 1, gstack, &gst );
+	newname = gmalloc( sizeof(string) + sourcename->l + l + 1, gstack, &gst );
 
 	/* copy library root and filename into the new string */
-	memcpy( c_str(n), libroot, l );
-	c_str(n)[l] = '/';
-	memcpy( c_str(n) + l + 1, c_str(s), s->l + 1 );
+	memcpy( c_str(newname), libroot, l );
+	c_str(newname)[l] = '\\'; /* needs to be reversed for Windows */
+	memcpy( c_str(newname) + l + 1, c_str(sourcename), sourcename->l + 1 );
+	
+	printf("including file %s\n",&newname->s);
 
-	spush(sst,n);
+	spush(sst,newname);
 
 	/* let load figure out the rest */
 	exec(*adr(load));
@@ -1215,16 +1195,14 @@ begin(chdir)
 	fpush(sst,v);
 end()
 /**(io) mkdir
- * "'foo 0 mkdir"
+ * "'foo mkdir"
  * Create a new directory. With name at TOS-1, and mode at TOS. Returns a
  * boolean value indicating success.
  */
 begin(mkdir)
-	int v, m;
+	int v;
 
-	m = fpop(sst);
-	
-	v = mkdir( scpop(sst), m) == 0 ? TRUE : FALSE;
+	v = mkdir( scpop(sst)) == 0 ? TRUE : FALSE;
 	
 	fpush(sst,v);
 end()
@@ -1251,20 +1229,6 @@ begin(unlink)
 
 	fpush(sst,v);
 end();
-/**(io) mkfifo
- * "'foo mkfifo"
- * Create a special file of the FIFO variety with the name at TOS-1, and the
- * permissions at TOS. Returns boolean success.
- */
-begin(mkfifo)
-	int v, m;
-
-	m = (ub4)fpop(sst);
-
-	v = mknod( scpop(sst), S_IFIFO | m, 0 ) == 0 ? TRUE : FALSE;
-
-	fpush(sst,v);
-end()
 /**(io) umask
  * "0 umask"
  * Set the process's new file permissions mask to the value at TOS.
@@ -1498,10 +1462,6 @@ begin(stat)
 				fpush(lst,buf.st_rdev);
 			else if ( strcmp( s, "size" ) == 0 )
 				fpush(lst,buf.st_size);
-			else if ( strcmp( s, "blksize" ) == 0 )
-				fpush(lst,buf.st_blksize);
-			else if ( strcmp( s, "blocks" ) == 0 )
-				fpush(lst,buf.st_blocks);
 			else if ( strcmp( s, "atime" ) == 0 )
 				fpush(lst,buf.st_atime);
 			else if ( strcmp( s, "mtime" ) == 0 )
@@ -1684,279 +1644,7 @@ begin(readdir)
 	else
 		fpush(sst,FALSE);
 end()
-/**(io) socket - (new)
- * "'inet 'stream 'tcp socket"
- * Create an endpoint for communication. This can later be used by connect
- * and listen to create a connection. 
- * 
- * 'domain 'type 'protocol socket
- * 
- * Domain should be a string matching one of the following:
- * "unix"	local (unix) communication
- * "inet"	ipv4 protocols
- * "inet6"	ipv6 protocols
- * "packet"	low level packet interface.
- *
- * Type should match one of:
- * "stream"	reliable, two-way, and connection based.
- * "dgram"	connectionless, unreliable and fixed length.
- * "seq"	a hybrid of stream and dgram.
- * "raw"	raw protocol access.
- *
- * Protocol can be any protocol that the system supports.
- * These should be listed in the /etc/protocols file on most systems.
- * Those most likely to be used include "tcp", "udp", and "icmp".
- *
- * FIXME: Some more error checking wouldn't hurt.
- */
-begin(socket)
-	int proto, type, domain, af, v;
-	struct protoent *p;
-	char *s = NULL;
 
-	/* Deduce protocol */
-	p = getprotobyname( scpop(sst) );
-	if ( p == NULL )
-		error("invalid socket protocol (%s)\n", s);
-
-	proto = p->p_proto;
-	
-
-	/* Deduce  Type */
-	s = scpop(sst);
-	if ( strcmp(s,"stream") == 0 )
-		type = SOCK_STREAM;
-	else if ( strcmp(s,"dgram") == 0 )
-		type = SOCK_DGRAM;
-	else if ( strcmp(s,"seq") == 0 )
-		type = SOCK_SEQPACKET;
-	else if ( strcmp(s,"raw") == 0 )
-		type = SOCK_RAW;
-	else
-		error("invalid socket type (%s)\n", s);
-		
-	/* Deduce domain */
-	s = scpop(sst);
-	if ( strcmp(s,"unix") == 0 )
-	{
-		domain = PF_UNIX;
-		af = AF_UNIX;
-	}
-	else if ( strcmp(s,"inet") == 0 )
-	{
-		domain = PF_INET;
-		af = AF_INET;
-	}
-	else if ( strcmp(s,"inet6") == 0 )
-	{
-		domain = PF_INET6;
-		af = AF_INET6;
-	}
-#if 0
-	else if ( strcmp(s,"packet") == 0 )
-	{
-		domain = PF_PACKET;
-		af = AF_PACKET;
-	}
-#endif
-	else
-		error("invalid socket domain (%s)\n", s);
-	
-	proto = type == SOCK_STREAM ? 0 : proto;
-	
-	v = socket( domain, type, proto );
-
-	if ( v == -1 )
-		fpush(sst,FALSE);
-	else
-	{
-		t_sock *sock;
-		
-		sock = malloc( sizeof( t_sock ) );
-		
-		sock->fp = fdopen(v, "w+");
-		sock->fd = v;
-		sock->pf = domain;
-		sock->af = af; 
-		sock->st = type;
-		sock->p	 = proto;
-		
-		filpush(sst,sock);
-		
-		fpush(sst,TRUE);
-	}
-	
-end()
-/**(io) bind - (new)
- * "'port sock bind"
- * Bind socket at TOS to port at TOS-1 ( or unix name as the case may be ) in 
- * the domain at TOS-2.
- */
-begin(bind)
-	int s;
-	char *port;
-	t_sock *sock;
-
-	sock	= ppop(sst);
-	s	= sock->fd;
-	port	= scpop(sst);
-
-	if ( sock->pf == PF_UNIX )
-	{
-		struct sockaddr_un *sun;
-		int size = sizeof( sa_family_t ) + *(port - 1);
-		
-		sun = calloc( 1, size );
-
-		sun->sun_family	= sock->af;
-
-		memcpy(&sun->sun_path, port, *(port - 1) );
-
-		if ( bind( s, (struct sockaddr *)sun, size ) < 0 )
-		{
-			free(sun);
-			error("bind failed\n");
-		}
-		free(sun);
-	}
-	else
-	{
-		struct sockaddr_in sin;
-		struct servent *ent;
-		
-		if ( isdigit( port[ 0 ] ) )
-			sin.sin_port = htons(atoi(port));
-		else
-		{
-			if ( ( ent = getservbyname(port,
-				     getprotobynumber(sock->p)->p_name
-			) ) == NULL )
-				error("invalid port name\n");
-			
-			sin.sin_port = ent->s_port;
-		}
-		
-		sin.sin_family		= sock->af;
-		sin.sin_addr.s_addr	= htonl(INADDR_ANY);
-
-		if ( bind( s, (struct sockaddr *)&sin, sizeof(sin) ) < 0 )
-			error("bind failed\n");
-	}
-end()
-/**(io) listen - (new)
- * "4 sock listen"
- * Initialize socket at TOS for listening. Queue TOS-1 many requests.
- */
-begin(listen)
-	t_sock *s;
-
-	s = ppop(sst);
-	
-	listen(s->fd, fpop(sst));
-end()
-/**(io) accept
- * "sock accept"
- * Accept a connection on the socket at TOS. Returns a new socket
- * representing the connection accepted.
- */
-begin(accept)
-	struct sockaddr_in sin;
-	socklen_t len;
-	int s;
-	t_sock *nsock;
-	t_sock *sock;
-
-	sock = ppop(sst);
-	nsock = malloc( sizeof( t_sock ) );
-
-	memcpy(nsock, sock, sizeof( t_sock ) );
-
-	s = accept( sock->fd, (struct sockaddr *)&sin, &len );
-
-	nsock->fd = s;
-	nsock->fp = fdopen(s, "w+" );
-	
-	filpush(sst,nsock);
-end()
-/**(io) connect
- * "'name 'port sock connect"
- * Initiate a connection to 'name at port 'port on the socket sock.
- */
-begin(connect)
-	char *addr, *port;
-	int s;
-	t_sock *sock;
-	
-	sock	= ppop(sst);
-	s	= sock->fd;
-	port	= scpop(sst);
-	addr	= scpop(sst);
-
-	if ( sock->pf == PF_UNIX )
-	{
-		struct sockaddr_un *sun;
-		int size = sizeof( sa_family_t ) + *(addr - 1);
-		
-		sun = calloc( 1, size );
-
-		sun->sun_family	= sock->af;
-
-		memcpy(&sun->sun_path, addr, *(addr - 1) );
-
-		if ( connect( s, (struct sockaddr *)sun, size ) < 0 )
-		{
-			free(sun);
-			error("uconnect failed\n");
-		}
-		free(sun);
-	}
-	else
-	{
-		struct sockaddr_in sin;
-		struct hostent *ent;
-		struct servent *sent;
-
-		if ( ( ent = gethostbyname(addr) ) == NULL )
-			error("hostname lookup failed.\n");
-	
-		sin.sin_addr	= *((struct in_addr*)ent->h_addr);
-
-		if ( isdigit(port[0]) )
-			sin.sin_port = htons(atoi(port));
-		else
-		{
-			if ( ( sent = getservbyname(port,
-				     getprotobynumber(sock->p)->p_name
-			) ) == NULL )
-				
-				error("invalid port name\n");
-			
-			sin.sin_port = sent->s_port;
-		}
-		
-		sin.sin_family		= sock->af;
-
-		if ( connect( s, (struct sockaddr *)&sin, sizeof(sin) ) < 0 )
-			error("connect failed\n");
-	}
-end()
-/**(io) shutdown - (new)
- * "sock 1 shutdown"
- * Shut down one direction of a full-duplex connection.
- * Socket is at TOS. TOS-1 specifies which direction:
- * 0 - incoming.
- * 1 - outgoing.
- * 2 - both.
- */
-begin(shutdown)
-	int fd;
-	int how;
-	fd = ((t_file *)ppop(sst))->fd;
-	how = fpop(sst);
-
-	/* FIXME: When should I close this stream? */
-	shutdown(fd, how);
-end()
 #ifdef HAVE_SYS_SENDFILE_H
 /**(io) sendfile - (new)
  * "start count dest src SENDFILE"
@@ -2054,9 +1742,6 @@ begin(hash_a)
 	i = fpop(sst);
 
 	fpush(sst,( i > 10 ? i + 48 + 7 : i + 48));
-end()
-begin(hash_match)
-	rpush(sst,&hash_match);
 end()
 /**(system) args[
  * 
@@ -3599,12 +3284,12 @@ begin(prompt)
 //		if ( column != 0 )
 //			putchar('\n');
 		
-		printf("\033[1;30m(\033[0m%i\033[1;30m)\033[37m", depth);
+		printf("(%i)", depth);
 
 		for ( i = depth; i > 0; i-- )
 			putchar('\t');
 
-		printf("->\033[0m ");
+		printf("-> ");
 
 		fflush(stdout);
 	}
@@ -4161,18 +3846,6 @@ begin(env_right_angle)
 	{
 		fpush(sst,FALSE);
 	}	
-end()
-/**(system) <env
- * "'/ 'HOME <env"
- * Set environment variable who's name matches the string at TOS to the
- * string value at TOS-1
- */
-begin(left_angle_env)
-	char *name, *val;
-	name = scpop(sst);
-	val = scpop(sst);
-	printk("setenv()");
-	setenv(name, val, 1); /* 1 means overwrite */
 end()
 /**(compiler) eval
  * Execute MSTOICAL source code in string at TOS.

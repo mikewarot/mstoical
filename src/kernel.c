@@ -176,8 +176,6 @@ cstmin	= (void*)&line->parm;
 line->name = NULL;
 /* */
 
-sig_init();
-
 goto start;
 
 #include "words.c"
@@ -266,7 +264,7 @@ if ( data->main )
 		if ( ( finput = fopen( argv[1], "r" ) ) == NULL )
 		{
 			fprintf(stderr, 
-			"mstoical: could not open input file!\n");
+			"mstoical: could not open input file!%s \n",argv[1]);
 			exit(1);
 		}
 		stt_lookup("rdline")->code = adr(frdline);
@@ -354,9 +352,10 @@ printk("Outer loop (NEXT) has returned, something is broken!");
 
 int main (int argc, char **argv)
 {
+	printf("cell size = %llu\n",sizeof(cell));
+	
 	struct thread_data *data;
 	int n = 0;
-	int tty;
 
 	libroot = LIBROOT;
 
@@ -405,17 +404,9 @@ int main (int argc, char **argv)
 	/* Initialize TSD key ) */
 	pthread_key_create( &tsd, (void*)thread_destroy );
 #endif
-	if ( ( tty = isatty(0) ) )
-	{
-		term_save();
-		term_cbreak(); 
-	}
 
 	st_start( data );
-	
-	if ( tty )
-		term_restore();
-	
+		
 	return(0);
 }
 

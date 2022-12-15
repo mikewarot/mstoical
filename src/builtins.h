@@ -29,11 +29,9 @@ struct voc_item builtins[] = {
 { A_WRD,"cancel",	adr(cancel) },
 { A_WRD,"shared",adr(shared) },
 #endif
-{ A_WRD,"delay",	adr(delay) },
 { A_WRD,"exit",	adr(exit) },
 { A_WRD,"abort",	adr(abort) },
 { A_WRD,"system", adr(system) },
-{ A_WRD,"<env", adr(left_angle_env) },
 { A_WRD,"env>", adr(env_right_angle) },
 
 { A_IMM,"mstoical<",adr(mstoical) },
@@ -50,7 +48,6 @@ struct voc_item builtins[] = {
 { A_WRD,"rmdir",	adr(rmdir) },
 { A_WRD,"chdir",	adr(chdir) },
 { A_WRD,"unlink",	adr(unlink) },
-{ A_WRD,"mkfifo",	adr(mkfifo) },
 { A_WRD,"umask",	adr(umask) },
 
 { A_WRD,"open",	adr(open) },
@@ -70,12 +67,6 @@ struct voc_item builtins[] = {
 { A_WRD,"closedir",	adr(closedir) },
 { A_WRD,"readdir",	adr(readdir) },
 
-{ A_WRD,"socket", adr(socket) },
-{ A_WRD,"bind", adr(bind) },
-{ A_WRD,"listen", adr(listen) },
-{ A_WRD,"accept", adr(accept) },
-{ A_WRD,"connect", adr(connect) },
-{ A_WRD,"shutdown", adr(shutdown) },
 #ifdef HAVE_SYS_SENDFILE_H
 { A_WRD,"sendfile", adr(sendfile) },
 #endif
@@ -96,7 +87,6 @@ struct voc_item builtins[] = {
 { A_WRD,"bool",	adr(bool) },
 { A_WRD,"iliteral",adr(iliteral) },
 { A_WRD,"radix",	adr(radix) },
-{ A_WRD,"#match",	adr(hash_match) },
 { A_WRD,"args[",	adr(args_bracket) },
 { A_WRD,"load",	adr(load) },
 { A_WRD,"include",adr(include) },

@@ -37,7 +37,7 @@ extern const char *a_types[];
 	{
 		char *nfmt;
 		va_list args;
-		char pre[] = "kernel: \033[1;32m%s\033[0m\n";
+		char pre[] = "kernel:%s\n";
 		
 		nfmt = malloc( strlen(fmt) + strlen(pre) );
 
@@ -151,7 +151,7 @@ void st_pword ( struct voc_entry *entry, struct voc_entry **high )
 			  strcmp( (*p)->name, "rs()" ) == 0 )
 		{
 			p++;
-			fprintf(stderr, "\e[1;30m(regex)\e[0m " );
+			fprintf(stderr, "(regex) " );
 		}
 		else
 		{
@@ -159,7 +159,7 @@ void st_pword ( struct voc_entry *entry, struct voc_entry **high )
 		}
 		
 		if ( p == high )
-			fprintf(stderr, "\e[0m");
+			fprintf(stderr, " ");
 	}
 }
 /* Print on stderr the formatted source version of the word 'entry' */

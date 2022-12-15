@@ -1,4 +1,4 @@
-#! /usr/local/bin/mstoical
+#! /mstoical/lib
 
 % This file contains high-level definitions to be automatically loaded by
 % MSTOICAL at startup. Documentation is automatically generated from the

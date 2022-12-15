@@ -36,14 +36,14 @@
 #include <dirent.h>
 
 /* networking */
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/un.h>
-#include <arpa/inet.h>
-#ifdef HAVE_SYS_SENDFILE_H
-#	include <sys/sendfile.h>
-#endif
+// #include <sys/socket.h>
+// #include <netdb.h>
+// #include <netinet/in.h>
+// #include <sys/un.h>
+// #include <arpa/inet.h>
+// #ifdef HAVE_SYS_SENDFILE_H
+// #	include <sys/sendfile.h>
+// #endif
 
 #ifdef THREADS
 /* threads */
