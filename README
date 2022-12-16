@@ -5,6 +5,8 @@ This is a fork of Stoical, which I found at http://stoical.sourceforge.net/
 
 I hope to adequately honor the gift which was given.
 
+This BRANCH of the GIT repository is where I try to get everything working properly in Windows 10 64bit, and maybe later backport to Win32.
+
 When I came across Stoical, I thought that it might offer a route around the dead end that I often saw in Forth implementations. Usually you get to the point where you need to work with non-trivial data structures, and the limitations of the cell based stack become a brick wall. By adding types and some fairly substatial data structures, those inadequacies of Forth should be overcome.
 
 It is my belief that MSTOICAL will eventually be able to mirror the capabilities of Lisp, with slightly fewer parenthesis.
@@ -16,18 +18,28 @@ at HackerNews, and went far beyond. We now have a viable program that I'll
 be working on for the forseable future.
 
 Current goals are
+  Understand the existing code
   Fixup everything to use new name
   remove Debian package folder stuff (that I don't understand)
   Code Cleanup / Bug Fixes
   Documentation
   Many working examples
+  
+Installation
 
-Note: If you install mstoical and find that backspace doesn't worrk correctly, you need to install readline, then run ./configure again, and reinstall
-
-  sudo apt-get install libreadline-dev
-  ./configure
-  sudo make install
-
+  This WINDOWS branch requires MinGW-64, which can be found at https://www.mingw-w64.org/
+  
+  It's hard-coded to run in c:\mstoical
+  
+  Clone the repository to that folder
+  
+  From a command prompt, cd to c:\mstoical\src, and run builder.bat
+  
+  you can then run mstoical.exe
+  
+  
+  
+  
 S  T  O  I  C  A  L					http://stoical.sf.net
 
 (c) 2002 Jonathan Moore Liles
