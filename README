@@ -11,11 +11,8 @@ When I came across Stoical, I thought that it might offer a route around the dea
 
 It is my belief that MSTOICAL will eventually be able to mirror the capabilities of Lisp, with slightly fewer parenthesis.
 
-I've long been interested in Forth and variants. I came across STOICAL
-a few years ago, and tried a few times to get it working, with not much luck.
-Thanks to a tremendous wave of support from those who answered my questions
-at HackerNews, and went far beyond. We now have a viable program that I'll
-be working on for the forseable future.
+I've long been interested in Forth and variants. I came across STOICAL a few years ago, and tried a few times to get it working, with not much luck.
+Thanks to a tremendous wave of support from those who answered my questions at HackerNews, and went far beyond. We now have a viable program that I'll be working on for the forseable future.
 
 Current goals are
   Understand the existing code
