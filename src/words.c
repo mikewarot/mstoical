@@ -996,6 +996,7 @@ end()
 begin(pdot)
 	printf("(%p) ", ppop(sst));
 end()
+/* Print a floating point number */
 begin(fdot)
 	printf("%g ", (double)fpop(sst)); 
 end()
